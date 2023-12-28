@@ -1,0 +1,4 @@
+(executable
+ (public_name github_tui)
+ (name main)
+ (libraries github_tui))
