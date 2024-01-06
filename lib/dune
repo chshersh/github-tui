@@ -1,2 +1,6 @@
 (library
- (name github_tui))
+ (name github_tui)
+ (libraries 
+   ezcurl
+ )
+)

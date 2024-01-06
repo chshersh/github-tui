@@ -12,6 +12,7 @@ bug-reports: "https://github.com/chshersh/github-tui/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.12"}
+  "ezcurl"
   "odoc" {with-doc}
 ]
 build: [

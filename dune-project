@@ -18,7 +18,11 @@
  (name github_tui)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune)
+ (depends 
+   ocaml
+   dune
+   ezcurl
+ )
  (tags
   (topics "to describe" your project)))
 
