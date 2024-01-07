@@ -7,12 +7,10 @@
 (source
  (github chshersh/github-tui))
 
-(authors "Dmitrii Kovanikov")
-(maintainers "Dmitrii Kovanikov")
+(authors "Dmitrii Kovanikov <chshersh@gmail.com>")
+(maintainers "Dmitrii Kovanikov <chshersh@gmail.com>")
 
-(license LICENSE)
-
-(documentation https://url/to/documentation)
+(license MPL-2.0)
 
 (package
  (name github_tui)
@@ -22,8 +20,10 @@
    ocaml
    dune
    ezcurl
+   minttea
+   terminal
  )
  (tags
-  (topics "to describe" your project)))
+  (tui cli git github)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

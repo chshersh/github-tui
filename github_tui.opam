@@ -2,17 +2,18 @@
 opam-version: "2.0"
 synopsis: "A short synopsis"
 description: "A longer description"
-maintainer: ["Dmitrii Kovanikov"]
-authors: ["Dmitrii Kovanikov"]
-license: "LICENSE"
-tags: ["topics" "to describe" "your" "project"]
+maintainer: ["Dmitrii Kovanikov <chshersh@gmail.com>"]
+authors: ["Dmitrii Kovanikov <chshersh@gmail.com>"]
+license: "MPL-2.0"
+tags: ["tui" "cli" "git" "github"]
 homepage: "https://github.com/chshersh/github-tui"
-doc: "https://url/to/documentation"
 bug-reports: "https://github.com/chshersh/github-tui/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.12"}
   "ezcurl"
+  "minttea"
+  "terminal"
   "odoc" {with-doc}
 ]
 build: [

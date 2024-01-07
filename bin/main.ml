@@ -1,3 +1,4 @@
+(*
 let () = print_endline @@ Github_tui.Gh.query
 {| 
 query {
@@ -14,3 +15,6 @@ query {
   }
 }
 |}
+*)
+
+let () = Github_tui.Tui.start ()
