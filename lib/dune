@@ -3,12 +3,8 @@
 (library
  (name github_tui)
  (libraries 
-   core
-   core_unix.command_unix
+   cmdliner
    ezcurl
    minttea
- )
- (preprocess 
-   (pps ppx_jane)
  )
 )

@@ -11,11 +11,9 @@ bug-reports: "https://github.com/chshersh/github-tui/issues"
 depends: [
   "ocaml" {>= "5.1"}
   "dune" {>= "3.12"}
-  "core" {>= "v0.16.2"}
-  "core_unix" {>= "v0.16.0"}
+  "cmdliner" {>= "1.2.0"}
   "ezcurl" {>= "0.2.4"}
   "minttea" {>= "0.0.2"}
-  "ppx_jane" {>= "v0.16.0"}
   "odoc" {with-doc}
 ]
 build: [

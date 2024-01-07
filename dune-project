@@ -19,11 +19,9 @@
  (depends 
    (ocaml (>= "5.1"))
    dune
-   (core (>= "v0.16.2"))
-   (core_unix (>= "v0.16.0"))
+   (cmdliner (>= "1.2.0"))
    (ezcurl (>= "0.2.4"))
    (minttea (>= "0.0.2"))
-   (ppx_jane (>= "v0.16.0"))
  )
  (tags
   (tui cli git github)))
