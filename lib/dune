@@ -3,6 +3,7 @@
 (library
  (name github_tui)
  (libraries 
+   ANSITerminal
    cmdliner
    ezcurl
    minttea

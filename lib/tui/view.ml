@@ -1,17 +1,20 @@
+let fmt (styles : ANSITerminal.style list) : string -> string =
+  ANSITerminal.sprintf styles "%s"
+
+let fmt_repo =
+  fmt ANSITerminal.([Bold; green])
+
 let view (model: Model.t) =
-  match model.tab with
-  | Code -> Format.sprintf
-    {|
-Code
+  let repo = fmt_repo model.repo in
+  let tab = 
+    match model.tab with
+    | Code -> "Code"
+    | Issues -> "Issues"
+    | PullRequests -> "Pull Requests" 
+  in
+  Format.sprintf 
+{|%s
 
-|}
-  | Issues -> Format.sprintf
-    {|
-Issues
+%s
 
-|}
-  | PullRequests -> Format.sprintf 
-    {|
-Pull Requests
-
-|}
+|} repo tab

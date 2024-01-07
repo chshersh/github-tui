@@ -4,10 +4,12 @@ type tab =
   | PullRequests
 
 type t =
-  { tab: tab ;
+  { repo: string ;
+    tab: tab ;
   }
 
-let initial_model: t =
+let initial_model repo: t =
   {
+     repo ;
      tab = Code;
   }

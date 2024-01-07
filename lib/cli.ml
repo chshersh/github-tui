@@ -1,7 +1,7 @@
 open Cmdliner
 
 let repo_arg =
-  let doc = "The GitHub repository to launch." in
+  let doc = "The GitHub repository to view in TUI." in
   Arg.(value & pos 0 string "NOT_SPECIFIED" & info [] ~docv:"OWNER/REPO" ~doc)
 
 let gh_tui_t = Term.(const Tui.start $ repo_arg)

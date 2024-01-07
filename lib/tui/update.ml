@@ -7,11 +7,11 @@ let update event (model: Model.t) =
 
   (* if we press a digit, we switch to the corresponding tab *)
   | Event.KeyDown (Key "1") ->
-    ({ tab = Model.Code }, Command.Noop)
+    ({ model with tab = Model.Code }, Command.Noop)
   | Event.KeyDown (Key "2") ->
-    ({ tab = Model.Issues }, Command.Noop)
+    ({ model with tab = Model.Issues }, Command.Noop)
   | Event.KeyDown (Key "3") ->
-    ({ tab = Model.PullRequests }, Command.Noop)
+    ({ model with tab = Model.PullRequests }, Command.Noop)
 
   (* otherwise, we do nothing *)
   | _ -> (model, Command.Noop)
