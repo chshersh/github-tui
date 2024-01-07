@@ -17,4 +17,4 @@ query {
 |}
 *)
 
-let () = Github_tui.Tui.start ()
+let () = Github_tui.Main.main ()
