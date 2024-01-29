@@ -4,13 +4,13 @@ let fmt (styles : ANSITerminal.style list) : string -> string =
 let fmt_repo =
   fmt ANSITerminal.([Bold; blue])
 
-let fmt_selected_tab =
+let fmt_selected =
   fmt ANSITerminal.([Bold; green])
 
-let tab_section cur_tab =
+let tabs_section cur_tab =
   let p_tab tab txt = 
     if cur_tab = tab
-    then Pretty.Str (fmt_selected_tab txt)
+    then Pretty.Str (fmt_selected txt)
     else Pretty.Str txt
   in
   Pretty.(render (
@@ -37,7 +37,7 @@ let tab_section cur_tab =
     )
   )
 
-let file_widget ~max_name_len files =
+let file_widget ~max_name_len ~selected files =
   (* Add two spaces for padding before and end of the file name *)
   let max_len = max_name_len + 4 in
   let top = "╭" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╮" in
@@ -46,20 +46,31 @@ let file_widget ~max_name_len files =
   let fmt_line line = 
     "│ " ^ String_extra.fill_right max_name_len line ^ " │"
   in
+  let hi_pos = 2 * selected + 1 in
   files
   |> List.map fmt_line
   |> List_extra.in_between ~sep:mid
   |> (fun lines -> [top] @ lines @ [bot])
+  |> List.mapi (fun i s ->
+    if i = hi_pos - 1 || i = hi_pos || i = hi_pos + 1
+      then fmt_selected s
+      else s
+  )
   |> String_extra.unlines
 
-let files_section files =
-  let max_name_len = files |> List.map String_extra.graphemes_len |> List.fold_left max 0 in
-  file_widget ~max_name_len files
+let code_section (code_tab: Model.code_tab) =
+  let max_name_len = code_tab.files |> List.map String_extra.graphemes_len |> List.fold_left max 0 in
+  file_widget ~max_name_len ~selected:code_tab.pos code_tab.files
+
+let tab_content_section (model: Model.t) =
+  match model.current_tab with
+  | Code -> code_section model.code_tab
+  | Issues | PullRequests -> ""
 
 let view (model: Model.t) =
   let repo = fmt_repo model.repo in
-  let tabs = tab_section model.tab in
-  let files = files_section model.files in
+  let tabs = tabs_section model.current_tab in
+  let content = tab_content_section model in
   Format.sprintf 
 {|%s
 
@@ -67,4 +78,4 @@ let view (model: Model.t) =
 
 %s
 
-|} repo tabs files
+|} repo tabs content

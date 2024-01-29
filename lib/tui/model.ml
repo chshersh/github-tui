@@ -1,17 +1,26 @@
+type code_tab =
+  {
+    pos: int ;
+    files: string list ;
+  }
+
 type tab = 
-  | Code
+  | Code 
   | Issues
   | PullRequests
 
 type t =
   { repo: string ;
-    tab: tab ;
-    files: string list ;
+    current_tab: tab ;
+    code_tab: code_tab ;
   }
 
 let initial_model repo: t =
   {
      repo ;
-     tab = Code;
-     files = [ "src/"; "lib/"; "README.md" ]
+     current_tab = Code;
+     code_tab = {
+      pos = 0;
+      files = [ "src/"; "lib/"; "README.md" ]
+     };
   }
