@@ -6,8 +6,13 @@ type doc =
   | Vertical of doc * doc
   | Horizontal of doc * doc
 
-let (---) t b = Vertical (t, b)
-let (<|>) l r = Horizontal (l, r)
+let row = function 
+  | [] -> Empty
+  | hd :: tl -> List.fold_left (fun l r -> Horizontal (l, r)) hd tl
+
+let col = function 
+  | [] -> Empty
+  | hd :: tl -> List.fold_left (fun l r -> Vertical (l, r)) hd tl
 
 let zip_lines l r =
   let max_len_l = List.map String_extra.graphemes_len l |> List.fold_left max 0 in
