@@ -18,7 +18,7 @@ let move_right model = model
 let update event (model: Model.t) =
   match event with
   (* if we press `q` or the escape key, we exit *)
-  | Event.KeyDown (Key "q" | Escape) -> (model, Command.Quit)
+  | Event.KeyDown (Key "q" | Escape) -> (model, Command.Seq [Command.Exit_alt_screen; Command.Quit])
 
   (* if we press a digit, we switch to the corresponding tab *)
   | Event.KeyDown (Key "1") ->
