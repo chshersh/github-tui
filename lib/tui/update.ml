@@ -2,18 +2,14 @@ open Minttea
 
 let move_up (model: Model.t) = match model.current_tab with
   | Code ->
-    let files_num = List.length model.code_tab.files in
-    let new_pos = (model.code_tab.pos + files_num - 1) mod files_num in
-    let code_tab = { model.code_tab with pos = new_pos } in
-    { model with code_tab }
+    let fs = Fs.go_up model.code_tab.fs in
+    { model with code_tab = { fs } }
   | Issues | PullRequests -> model
 
 let move_down (model: Model.t) = match model.current_tab with
   | Code ->
-    let files_num = List.length model.code_tab.files in
-    let new_pos = (model.code_tab.pos + 1) mod files_num in
-    let code_tab = { model.code_tab with pos = new_pos } in
-    { model with code_tab }
+    let fs = Fs.go_down model.code_tab.fs in
+    { model with code_tab = { fs } }
   | Issues | PullRequests -> model
 
 let move_left model = model

@@ -48,6 +48,7 @@ let file_widget ~max_name_len ~selected files =
   in
   let hi_pos = 2 * selected + 1 in
   files
+  |> Array.to_list
   |> List.map fmt_line
   |> List_extra.in_between ~sep:mid
   |> (fun lines -> [top] @ lines @ [bot])
@@ -59,8 +60,13 @@ let file_widget ~max_name_len ~selected files =
   |> String_extra.unlines
 
 let code_section (code_tab: Model.code_tab) =
-  let max_name_len = code_tab.files |> List.map String_extra.graphemes_len |> List.fold_left max 0 in
-  file_widget ~max_name_len ~selected:code_tab.pos code_tab.files
+  let cursor = code_tab.fs.current in
+  let files = Array.map Fs.file_name cursor.files in
+  let max_name_len = 
+    files 
+    |> Array.map String_extra.graphemes_len
+    |> Array.fold_left max 0 in
+  file_widget ~max_name_len ~selected:cursor.pos files
 
 let tab_content_section (model: Model.t) =
   match model.current_tab with

@@ -1,7 +1,6 @@
 type code_tab =
   {
-    pos: int ;
-    files: string list ;
+    fs: Fs.zipper ;
   }
 
 type tab = 
@@ -20,7 +19,17 @@ let initial_model repo: t =
      repo ;
      current_tab = Code;
      code_tab = {
-      pos = 0;
-      files = [ "src/"; "lib/"; "README.md" ]
+      fs = 
+        {
+          parents = [];
+          current = {
+            pos = 0;
+            files = 
+              [| Dir ("src/", [||]);
+                 Dir ("lib/", [||]);
+                 File "README.md";
+              |]
+          }
+        }
      };
   }
