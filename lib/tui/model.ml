@@ -3,8 +3,8 @@ type code_tab =
     fs: Fs.zipper ;
   }
 
-type tab = 
-  | Code 
+type tab =
+  | Code
   | Issues
   | PullRequests
 
@@ -19,14 +19,30 @@ let initial_model repo: t =
      repo ;
      current_tab = Code;
      code_tab = {
-      fs = 
+      fs =
         {
           parents = [];
           current = {
             pos = 0;
-            files = 
-              [| Dir ("src/", [||]);
-                 Dir ("lib/", [||]);
+            files =
+              [| Dir ("src/", [|
+                  File "extra.ml";
+                  File "zoo.ml"; |]);
+                 Dir ("lib/", [|
+                  File "fs.ml";
+                  File "fs.mli";
+                  File "tui.ml";
+                  File "tui.mli";
+                  File "cli.ml";
+                  File "cli.mli";
+                  File "list.ml";
+                  File "list.mli"; |]);
+                 Dir ("configs/", [||]);
+                 Dir ("docs/", [|
+                  File "how-to.md";
+                  File "troubleshooting.md" |]);
+                 Dir ("app/", [|
+                  File "main.ml" |]);
                  File "README.md";
               |]
           }

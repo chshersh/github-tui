@@ -41,8 +41,15 @@ let tabs_section cur_tab =
         ];
     ]
 
-let file_widget ~max_name_len ~selected files =
+let current_level_to_doc (cursor: Fs.cursor) =
   let open Pretty in
+
+  let files = Array.map Fs.file_name cursor.files in
+  let max_name_len =
+    files
+    |> Array.map String_extra.graphemes_len
+    |> Array.fold_left max 0
+  in
 
   (* Add two spaces for padding before and end of the file name *)
   let max_len = max_name_len + 4 in
@@ -56,7 +63,7 @@ let file_widget ~max_name_len ~selected files =
   let fmt_line line =
     "│ " ^ String_extra.fill_right max_name_len line ^ " │"
   in
-  let hi_pos = 2 * selected + 1 in
+  let hi_pos = 2 * cursor.pos + 1 in
 
   (* Combine *)
   files
@@ -71,14 +78,64 @@ let file_widget ~max_name_len ~selected files =
   )
   |> col
 
-let code_section (code_tab: Model.code_tab) =
-  let cursor = code_tab.fs.current in
-  let files = Array.map Fs.file_name cursor.files in
+let children_to_doc ~prev_total:_ ~pos:_ children =
+  let open Pretty in
+
+  let files = Array.map Fs.file_name children in
   let max_name_len =
     files
     |> Array.map String_extra.graphemes_len
-    |> Array.fold_left max 0 in
-  file_widget ~max_name_len ~selected:cursor.pos files
+    |> Array.fold_left max 0
+  in
+
+  (* Add two spaces for padding before and end of the file name *)
+  let max_len = max_name_len + 4 in
+
+  (* Frame *)
+  let top = "╭" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╮" in
+  let mid = "├" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "┤" in
+  let bot = "╰" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╯" in
+
+  (* Line *)
+  let fmt_line line =
+    "│ " ^ String_extra.fill_right max_name_len line ^ " │"
+  in
+
+  (* Combine *)
+  files
+  |> Array.to_list
+  |> List.map fmt_line
+  |> List_extra.in_between ~sep:mid
+  |> (fun lines -> [top] @ lines @ [bot])
+  |> List.map str
+  |> col
+
+let next_level_to_doc ~prev_total ~pos (selected_file: Fs.tree) =
+  (* Get the next level files *)
+  match selected_file with
+  (* No children of a file *)
+  | File _ -> None
+  (* No children of a directory without children *)
+  | Dir (_, [||]) -> None
+  (* Non-empty array of children *)
+  | Dir (_, children) -> Some (children_to_doc ~prev_total ~pos children)
+
+let fs_doc (fs : Fs.zipper) =
+  let current = fs.current in
+  let current_level_doc = current_level_to_doc current in
+  let next_level_doc =
+    Option.bind
+      (Fs.file_at current)
+      (next_level_to_doc ~prev_total:(Array.length current.files) ~pos:current.pos)
+  in
+  match next_level_doc with
+  | None ->
+    current_level_doc
+  | Some next_level_doc ->
+    Pretty.row [ current_level_doc; next_level_doc]
+
+let code_section (code_tab: Model.code_tab) =
+  fs_doc code_tab.fs
 
 let tab_content_section (model: Model.t) =
   match model.current_tab with
