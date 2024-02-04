@@ -37,7 +37,7 @@ let tabs_section cur_tab =
         [
           p_tab Model.PullRequests "╭───────────────╮";
           p_tab Model.PullRequests "│ Pull Requests │";
-          p_tab Model.PullRequests "┴───────────────┴";
+          p_tab Model.PullRequests "┴───────────────┘";
         ];
     ]
 
