@@ -1,24 +1,21 @@
-let fmt (styles : ANSITerminal.style list) : string -> string =
-  ANSITerminal.sprintf styles "%s"
+let style_repo =
+  ANSITerminal.([Bold; blue])
 
-let fmt_repo =
-  fmt ANSITerminal.([Bold; blue])
-
-let fmt_selected =
-  fmt ANSITerminal.([Bold; green])
+let style_selected =
+  ANSITerminal.([Bold; green])
 
 let tabs_section cur_tab =
   let open Pretty in
   let p_tab tab txt = 
     if cur_tab = tab
-    then Str (fmt_selected txt)
-    else Str txt
+    then fmt style_selected txt
+    else str txt
   in
   let sep = col
     [
-      Str " ";
-      Str " ";
-      Str "─";
+      str " ";
+      str " ";
+      str "─";
     ]
   in
   render @@ row
@@ -61,7 +58,7 @@ let file_widget ~max_name_len ~selected files =
   |> (fun lines -> [top] @ lines @ [bot])
   |> List.mapi (fun i s ->
     if i = hi_pos - 1 || i = hi_pos || i = hi_pos + 1
-      then fmt_selected s
+      then ANSITerminal.sprintf style_selected "%s" s
       else s
   )
   |> String_extra.unlines
@@ -81,7 +78,7 @@ let tab_content_section (model: Model.t) =
   | Issues | PullRequests -> ""
 
 let view (model: Model.t) =
-  let repo = fmt_repo model.repo in
+  let repo = ANSITerminal.sprintf style_repo "%s" model.repo in
   let tabs = tabs_section model.current_tab in
   let content = tab_content_section model in
   Format.sprintf 

@@ -23,7 +23,7 @@
    (cmdliner (>= "1.2.0"))
    (ezcurl (>= "0.2.4"))
    (minttea (>= "0.0.2"))
-   uuseg.string
+   uuseg
  )
  (tags
   (tui cli git github)))
