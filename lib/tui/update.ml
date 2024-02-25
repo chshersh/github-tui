@@ -1,21 +1,28 @@
 open Minttea
 
+let move_fs move_fn (code_tab: Model.code_tab) =
+  let fs = move_fn code_tab.fs in
+  { code_tab with fs = fs }
+
 let move_up (model: Model.t) = match model.current_tab with
   | Code ->
-    let fs = Fs.go_up model.code_tab.fs in
-    let new_code_tab = { model.code_tab with fs = fs } in
-    { model with code_tab = new_code_tab }
+    { model with code_tab = move_fs Fs.go_up model.code_tab }
   | Issues | PullRequests -> model
 
 let move_down (model: Model.t) = match model.current_tab with
   | Code ->
-    let fs = Fs.go_down model.code_tab.fs in
-    let new_code_tab = { model.code_tab with fs = fs } in
-    { model with code_tab = new_code_tab }
+    { model with code_tab = move_fs Fs.go_down model.code_tab }
   | Issues | PullRequests -> model
 
-let move_left model = model
-let move_right model = model
+let move_back (model: Model.t) = match model.current_tab with
+  | Code ->
+    { model with code_tab = move_fs Fs.go_back model.code_tab }
+  | Issues | PullRequests -> model
+
+let move_next (model: Model.t) = match model.current_tab with
+  | Code ->
+    { model with code_tab = move_fs Fs.go_next model.code_tab }
+  | Issues | PullRequests -> model
 
 let update event (model: Model.t) =
   match event with
@@ -36,9 +43,9 @@ let update event (model: Model.t) =
   | Event.KeyDown (Down | Key "j") ->
     (move_down model, Command.Noop)
   | Event.KeyDown (Left | Key "h") ->
-    (move_left model, Command.Noop)
+    (move_back model, Command.Noop)
   | Event.KeyDown (Right | Key "l") ->
-    (move_right model, Command.Noop)
+    (move_next model, Command.Noop)
 
   (* otherwise, we do nothing *)
   | _ -> (model, Command.Noop)

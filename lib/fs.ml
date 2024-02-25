@@ -79,3 +79,23 @@ let go_up zipper =
   let new_pos = (cursor.pos + len - 1) mod len in
   let new_cursor = { cursor with pos = new_pos } in
   { zipper with current = new_cursor }
+
+let go_next zipper =
+  let cursor = zipper.current in
+  let next = file_at cursor in
+  match next with
+  | None -> zipper
+  | Some (File _) -> zipper
+  | Some (Dir (_, next)) ->
+    if Array.length next = 0 then
+      zipper
+    else
+      {
+        parents = cursor :: zipper.parents;
+        current = { pos = 0; files = next; }
+      }
+
+let go_back zipper =
+  match zipper.parents with
+  | [] -> zipper
+  | current :: parents -> { parents; current; }
