@@ -1,5 +1,8 @@
 type code_tab =
   {
+    (* Repository directory *)
+    dirname: string;
+    (* Zipper of the repository code *)
     fs: Fs.zipper ;
   }
 
@@ -14,38 +17,12 @@ type t =
     code_tab: code_tab ;
   }
 
-let initial_model repo: t =
+let initial_model ~repo ~dirname ~files =
   {
      repo ;
      current_tab = Code;
      code_tab = {
-      fs =
-        {
-          parents = [];
-          current = {
-            pos = 0;
-            files =
-              [| Dir ("src/", [|
-                  File "extra.ml";
-                  File "zoo.ml"; |]);
-                 Dir ("lib/", [|
-                  File "fs.ml";
-                  File "fs.mli";
-                  File "tui.ml";
-                  File "tui.mli";
-                  File "cli.ml";
-                  File "cli.mli";
-                  File "list.ml";
-                  File "list.mli"; |]);
-                 Dir ("configs/", [||]);
-                 Dir ("docs/", [|
-                  File "how-to.md";
-                  File "troubleshooting.md" |]);
-                 Dir ("app/", [|
-                  File "main.ml" |]);
-                 File "README.md";
-              |]
-          }
-        }
+      dirname;
+      fs = Fs.zip_it files;
      };
   }

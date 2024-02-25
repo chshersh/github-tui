@@ -3,13 +3,15 @@ open Minttea
 let move_up (model: Model.t) = match model.current_tab with
   | Code ->
     let fs = Fs.go_up model.code_tab.fs in
-    { model with code_tab = { fs } }
+    let new_code_tab = { model.code_tab with fs = fs } in
+    { model with code_tab = new_code_tab }
   | Issues | PullRequests -> model
 
 let move_down (model: Model.t) = match model.current_tab with
   | Code ->
     let fs = Fs.go_down model.code_tab.fs in
-    { model with code_tab = { fs } }
+    let new_code_tab = { model.code_tab with fs = fs } in
+    { model with code_tab = new_code_tab }
   | Issues | PullRequests -> model
 
 let move_left model = model
