@@ -4,6 +4,9 @@ let style_repo =
 let style_selected =
   ANSITerminal.([Bold; green])
 
+let style_directory =
+  ANSITerminal.([Bold; magenta])
+
 let tabs_section cur_tab =
   let open Pretty in
   let p_tab tab txt =
@@ -40,6 +43,19 @@ let tabs_section cur_tab =
           p_tab Model.PullRequests "┴───────────────┘";
         ];
     ]
+
+let current_path_to_doc root_path parents =
+  let nested_path =
+    match parents with
+    | [] -> ""
+    | last :: previous ->
+      List.fold_right
+        (fun cur acc -> Filename.concat acc cur)
+        (List.rev previous)
+        last
+  in
+  let full_path = Filename.concat root_path nested_path in
+  Pretty.fmt style_directory full_path
 
 let current_level_to_doc (cursor: Fs.cursor) has_next =
   let open Pretty in
@@ -183,7 +199,15 @@ let fs_doc (fs : Fs.zipper) =
     Pretty.row [ current_level_doc; next_level_doc]
 
 let code_section (code_tab: Model.code_tab) =
-  fs_doc code_tab.fs
+  let current_path_doc = current_path_to_doc
+    code_tab.dirname
+    (Fs.zipper_parents code_tab.fs)
+  in
+  Pretty.col
+    [
+      current_path_doc;
+      fs_doc code_tab.fs;
+    ]
 
 let tab_content_section (model: Model.t) =
   match model.current_tab with
@@ -204,8 +228,6 @@ let to_doc (model: Model.t) =
       empty;
 
       tabs;
-      empty;
-
       content;
       empty;
     ]

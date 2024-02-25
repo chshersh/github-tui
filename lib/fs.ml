@@ -61,6 +61,11 @@ let zip_it trees =
     current = { pos = 0; files = trees; }
   }
 
+let zipper_parents zipper =
+  List.filter_map
+    (fun cursor -> Option.map file_name (file_at cursor))
+    zipper.parents
+
 let go_down zipper =
   let cursor = zipper.current in
   let len = Array.length cursor.files in
