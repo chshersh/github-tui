@@ -46,13 +46,10 @@ let tabs_section cur_tab =
 
 let current_path_to_doc root_path parents =
   let nested_path =
-    match parents with
-    | [] -> ""
-    | last :: previous ->
-      List.fold_right
-        (fun cur acc -> Filename.concat acc cur)
-        (List.rev previous)
-        last
+    List.fold_left
+      (fun acc cur -> Filename.concat acc cur)
+      ""
+      (List.rev parents)
   in
   let full_path = Filename.concat root_path nested_path in
   Pretty.fmt style_directory full_path
