@@ -10,10 +10,10 @@ val str : string -> doc
 (** Create a single chunk of string with formatting. *)
 val fmt : styles -> string -> doc
 
-(** Put all documents in a list vertically after each other with a line separator. *)
+(** Put all documents in a list horizontally, automatically adding required padding. *)
 val row : doc list -> doc
 
-(** Put all documents in a list horizontally, automatically adding required padding. *)
+(** Put all documents in a list vertically after each other with a line separator. *)
 val col : doc list -> doc
 
 (** Render the resulting document. *)

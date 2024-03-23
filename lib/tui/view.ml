@@ -4,32 +4,14 @@ let style_directory = ANSITerminal.[ Bold; magenta ]
 
 let tabs_section cur_tab =
   let open Pretty in
-  let p_tab tab txt =
-    if cur_tab = tab then fmt style_selected txt else str txt
-  in
   let sep = col [ str " "; str " "; str "─" ] in
   row
     [
-      col
-        [
-          p_tab Model.Code "╭──────╮";
-          p_tab Model.Code "│ Code │";
-          p_tab Model.Code "└──────┴";
-        ];
+      Widget.code_tab ~is_selected:(cur_tab = Model.Code);
       sep;
-      col
-        [
-          p_tab Model.Issues "╭────────╮";
-          p_tab Model.Issues "│ Issues │";
-          p_tab Model.Issues "┴────────┴";
-        ];
+      Widget.issues_tab ~is_selected:(cur_tab = Model.Issues);
       sep;
-      col
-        [
-          p_tab Model.PullRequests "╭───────────────╮";
-          p_tab Model.PullRequests "│ Pull Requests │";
-          p_tab Model.PullRequests "┴───────────────┘";
-        ];
+      Widget.pull_requests_tab ~is_selected:(cur_tab = Model.PullRequests);
     ]
 
 let current_path_to_doc root_path parents =
