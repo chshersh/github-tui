@@ -33,3 +33,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/chshersh/github-tui.git"
+pin-depends: [
+  ["minttea.dev" "git+https://github.com/leostera/minttea"]
+]
