@@ -8,58 +8,50 @@ let file_name = function
 
 (* A files comparison:
 
-1. Directories before files
-2. Otherwise, lexicographically
+   1. Directories before files
+   2. Otherwise, lexicographically
 *)
 let order_files t1 t2 =
   match (t1, t2) with
-  | (Dir _, File _) -> -1
-  | (File _, Dir _) -> 1
-  | (File name_1, File name_2) -> String.compare name_1 name_2
-  | (Dir (name_1, _), Dir (name_2, _)) -> String.compare name_1 name_2
+  | Dir _, File _ -> -1
+  | File _, Dir _ -> 1
+  | File name_1, File name_2 -> String.compare name_1 name_2
+  | Dir (name_1, _), Dir (name_2, _) -> String.compare name_1 name_2
 
 let rec sort_tree = function
   | File name -> File name
   | Dir (name, children) ->
-    Array.sort order_files children;
-    Dir (name, Array.map sort_tree children)
+      Array.sort order_files children;
+      Dir (name, Array.map sort_tree children)
 
 let rec to_tree path =
   if Sys.is_directory path then
-    let children = Array.map
-      (fun child_name -> to_tree (Filename.concat path child_name))
-      (Sys.readdir path)
+    let children =
+      Array.map
+        (fun child_name -> to_tree (Filename.concat path child_name))
+        (Sys.readdir path)
     in
     let dirname = Filename.basename path ^ "/" in
     Dir (dirname, children)
-  else
-    File (Filename.basename path)
+  else File (Filename.basename path)
 
-let read_tree path =
-  path |> to_tree |> sort_tree
+let read_tree path = path |> to_tree |> sort_tree
 
-type cursor =
-  {
-     pos: int;
-     files: tree array;
-  }
+type cursor = {
+  pos : int;
+  files : tree array;
+}
 
 let file_at cursor =
-  if cursor.pos < 0 || Array.length cursor.files <= cursor.pos
-  then None
+  if cursor.pos < 0 || Array.length cursor.files <= cursor.pos then None
   else Some cursor.files.(cursor.pos)
 
-type zipper =
-   {
-     parents: cursor list;
-     current: cursor;
-   }
+type zipper = {
+  parents : cursor list;
+  current : cursor;
+}
 
-let zip_it trees =
-  {
-    parents = [];
-    current = { pos = 0; files = trees; }
-  }
+let zip_it trees = { parents = []; current = { pos = 0; files = trees } }
 
 let zipper_parents zipper =
   List.filter_map
@@ -87,15 +79,14 @@ let go_next zipper =
   | None -> zipper
   | Some (File _) -> zipper
   | Some (Dir (_, next)) ->
-    if Array.length next = 0 then
-      zipper
-    else
-      {
-        parents = cursor :: zipper.parents;
-        current = { pos = 0; files = next; }
-      }
+      if Array.length next = 0 then zipper
+      else
+        {
+          parents = cursor :: zipper.parents;
+          current = { pos = 0; files = next };
+        }
 
 let go_back zipper =
   match zipper.parents with
   | [] -> zipper
-  | current :: parents -> { parents; current; }
+  | current :: parents -> { parents; current }
