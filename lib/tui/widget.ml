@@ -66,7 +66,6 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
 
 let current_level_to_doc (cursor : Fs.cursor) has_next =
   let open Pretty in
-
   let max_name_len = max_file_name_len cursor.files in
   let max_len = max_name_len + file_name_padding in
 
@@ -96,7 +95,6 @@ let current_level_to_doc (cursor : Fs.cursor) has_next =
 
 let children_to_doc ~prev_total ~pos children =
   let open Pretty in
-
   let max_name_len = max_file_name_len children in
   let max_len = max_name_len + file_name_padding in
 
@@ -159,10 +157,9 @@ let next_level_to_doc ~prev_total ~pos (selected_file : Fs.tree) =
 let fs (fs : Fs.zipper) =
   let current = fs.current in
   let next_level_doc =
-    Option.bind (Fs.file_at current)
-      (next_level_to_doc
-         ~prev_total:(Array.length current.files)
-         ~pos:current.pos)
+    next_level_to_doc
+      ~prev_total:(Array.length current.files)
+      ~pos:current.pos (Fs.file_at current)
   in
   let current_level_doc =
     current_level_to_doc current (Option.is_some next_level_doc)

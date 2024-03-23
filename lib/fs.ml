@@ -42,9 +42,7 @@ type cursor = {
   files : tree array;
 }
 
-let file_at cursor =
-  if cursor.pos < 0 || Array.length cursor.files <= cursor.pos then None
-  else Some cursor.files.(cursor.pos)
+let file_at cursor = cursor.files.(cursor.pos)
 
 type zipper = {
   parents : cursor list;
@@ -54,9 +52,7 @@ type zipper = {
 let zip_it trees = { parents = []; current = { pos = 0; files = trees } }
 
 let zipper_parents zipper =
-  List.filter_map
-    (fun cursor -> Option.map file_name (file_at cursor))
-    zipper.parents
+  List.map (fun cursor -> file_name (file_at cursor)) zipper.parents
 
 let go_down zipper =
   let cursor = zipper.current in
@@ -76,9 +72,8 @@ let go_next zipper =
   let cursor = zipper.current in
   let next = file_at cursor in
   match next with
-  | None -> zipper
-  | Some (File _) -> zipper
-  | Some (Dir (_, next)) ->
+  | File _ -> zipper
+  | Dir (_, next) ->
       if Array.length next = 0 then zipper
       else
         {

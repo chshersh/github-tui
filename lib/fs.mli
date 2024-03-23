@@ -16,7 +16,7 @@ type cursor = {
 }
 
 (** Return the currently selected file in file cursor. *)
-val file_at : cursor -> tree option
+val file_at : cursor -> tree
 
 (** A file tree zipper that allows to traverse the tree in four directions. *)
 type zipper = {
