@@ -27,24 +27,48 @@ let pull_requests_tab ~is_selected =
       "┴───────────────┘";
     ] [@@ocamlformat "disable"]
 
+let pwd_char = "\u{f413}"
+let dir_char = "\u{f4d4}"
+let empty_dir_char = "\u{f413}"
+let file_char = "\u{f4a5}"
+
 let pwd root_path parents =
   let nested_path =
     List.fold_left
       (fun acc cur -> Filename.concat acc cur)
       "" (List.rev parents)
   in
-  let full_path = Filename.concat root_path nested_path in
+  let full_path = pwd_char ^ " " ^ Filename.concat root_path nested_path in
   Pretty.fmt style_directory full_path
+
+(* Extra padding for:
+
+   * 1: Unicode box character (left)
+   * 1: Space after left box character
+   * 1: File/Directory icon
+   * 1: Space after icon
+   * 1: Space before right box character
+   * 1: Unicode box character (right)
+*)
+let file_name_padding = 6
+
+let max_file_name_len files =
+  files
+  |> Array.map (fun file -> file |> Fs.file_name |> String_extra.graphemes_len)
+  |> Array.fold_left max 0
+
+let fmt_file ~max_name_len (tree : Fs.tree) =
+  let pad = String_extra.fill_right max_name_len in
+  match tree with
+  | File name -> file_char ^ " " ^ pad name
+  | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
+  | Dir (name, _) -> dir_char ^ " " ^ pad name
 
 let current_level_to_doc (cursor : Fs.cursor) has_next =
   let open Pretty in
-  let files = Array.map Fs.file_name cursor.files in
-  let max_name_len =
-    files |> Array.map String_extra.graphemes_len |> Array.fold_left max 0
-  in
 
-  (* Add two spaces for padding before and end of the file name *)
-  let max_len = max_name_len + 4 in
+  let max_name_len = max_file_name_len cursor.files in
+  let max_len = max_name_len + file_name_padding in
 
   (* Frame *)
   let top = "╭" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╮" in
@@ -52,18 +76,16 @@ let current_level_to_doc (cursor : Fs.cursor) has_next =
   let bot = "╰" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╯" in
 
   (* Line *)
-  let fmt_selected_line line =
-    "│ " ^ String_extra.fill_right max_name_len line ^ " ├"
-  in
-  let fmt_line line = "│ " ^ String_extra.fill_right max_name_len line ^ " │" in
+  let fmt_selected_name file = "│ " ^ fmt_file ~max_name_len file ^ " ├" in
+  let fmt_name file = "│ " ^ fmt_file ~max_name_len file ^ " │" in
   let hi_pos = (2 * cursor.pos) + 1 in
 
   (* Combine *)
-  files
+  cursor.files
   |> Array.to_list
-  |> List.mapi (fun i line ->
-         if i = cursor.pos && has_next then fmt_selected_line line
-         else fmt_line line)
+  |> List.mapi (fun i file ->
+         if i = cursor.pos && has_next then fmt_selected_name file
+         else fmt_name file)
   |> List_extra.in_between ~sep:mid
   |> (fun lines -> [ top ] @ lines @ [ bot ])
   |> List.mapi (fun i s ->
@@ -74,14 +96,9 @@ let current_level_to_doc (cursor : Fs.cursor) has_next =
 
 let children_to_doc ~prev_total ~pos children =
   let open Pretty in
-  (* This array is guaranteed to be non-empty at this point *)
-  let files = Array.map Fs.file_name children in
-  let max_name_len =
-    files |> Array.map String_extra.graphemes_len |> Array.fold_left max 0
-  in
 
-  (* Add two spaces for padding before and end of the file name *)
-  let max_len = max_name_len + 4 in
+  let max_name_len = max_file_name_len children in
+  let max_len = max_name_len + file_name_padding in
 
   (* Frame *)
   let top = "  ╭" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╮" in
@@ -98,8 +115,8 @@ let children_to_doc ~prev_total ~pos children =
     |> col
   in
 
-  (* Line *)
-  let fmt_line i line =
+  (* Formatting single file name *)
+  let fmt_name i file =
     let is_first_pos = i = 0 in
     let is_last_pos = i = Array.length children - 1 in
     let has_more_than_one = Array.length children > 1 in
@@ -108,14 +125,14 @@ let children_to_doc ~prev_total ~pos children =
       else if is_last_pos then "└"
       else "├"
     in
-    prefix ^ "─┤ " ^ String_extra.fill_right max_name_len line ^ " │"
+    prefix ^ "─┤ " ^ fmt_file ~max_name_len file ^ " │"
   in
 
   (* Next level files *)
   let files_doc =
-    files
+    children
     |> Array.to_list
-    |> List.mapi fmt_line
+    |> List.mapi fmt_name
     |> List_extra.in_between ~sep:mid
     |> (fun lines -> [ top ] @ lines @ [ bot ])
     |> (fun lines ->
