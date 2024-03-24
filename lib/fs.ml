@@ -1,10 +1,10 @@
 type tree =
-  | File of string
+  | File of string * string lazy_t
   | Dir of string * tree array
 
 let file_name = function
-  | File path -> path
-  | Dir (path, _) -> path
+  | File (name, _) -> name
+  | Dir (name, _) -> name
 
 (* A files comparison:
 
@@ -15,14 +15,21 @@ let order_files t1 t2 =
   match (t1, t2) with
   | Dir _, File _ -> -1
   | File _, Dir _ -> 1
-  | File name_1, File name_2 -> String.compare name_1 name_2
-  | Dir (name_1, _), Dir (name_2, _) -> String.compare name_1 name_2
+  | _, _ -> String.compare (file_name t1) (file_name t2)
 
 let rec sort_tree = function
-  | File name -> File name
+  | File (name, contents) -> File (name, contents)
   | Dir (name, children) ->
       Array.sort order_files children;
       Dir (name, Array.map sort_tree children)
+
+(* Reads file contents using 'bat' to have pretty syntax highlighting *)
+let read_file_contents path =
+  let cmd =
+    "bat --plain --color=always --italic-text=always --paging=never \
+     --terminal-width=80 " ^ path
+  in
+  Shell.proc_stdout cmd
 
 let rec to_tree path =
   if Sys.is_directory path then
@@ -33,7 +40,7 @@ let rec to_tree path =
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
-  else File (Filename.basename path)
+  else File (Filename.basename path, lazy (read_file_contents path))
 
 let read_tree path = path |> to_tree |> sort_tree
 

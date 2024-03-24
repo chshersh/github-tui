@@ -27,19 +27,30 @@ let pull_requests_tab ~is_selected =
       "┴───────────────┘";
     ] [@@ocamlformat "disable"]
 
-let pwd_char = "\u{f413}"
+let pwd_char = "\u{e5fd}"
 let dir_char = "\u{f4d4}"
 let empty_dir_char = "\u{f413}"
 let file_char = "\u{f4a5}"
 
-let pwd root_path parents =
-  let nested_path =
-    List.fold_left
-      (fun acc cur -> Filename.concat acc cur)
-      "" (List.rev parents)
-  in
-  let full_path = pwd_char ^ " " ^ Filename.concat root_path nested_path in
+let parents_path parents =
+  List.fold_left (fun acc cur -> Filename.concat acc cur) "" (List.rev parents)
+
+let pwd root_dir_path parents =
+  let pwd_path = parents_path parents in
+  let root_dir_name = Filename.basename root_dir_path in
+  let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
   Pretty.fmt style_directory full_path
+
+let file_contents_to_doc ~file_name:_ ~file_contents =
+  let file_contents_preview =
+    file_contents
+    |> Lazy.force
+    |> String.split_on_char '\n'
+    |> List_extra.take 30
+    |> List.map Pretty.str
+    |> Pretty.col
+  in
+  Pretty.(row [ str " "; file_contents_preview ])
 
 (* Extra padding for:
 
@@ -60,11 +71,11 @@ let max_file_name_len files =
 let fmt_file ~max_name_len (tree : Fs.tree) =
   let pad = String_extra.fill_right max_name_len in
   match tree with
-  | File name -> file_char ^ " " ^ pad name
+  | File (name, _) -> file_char ^ " " ^ pad name
   | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
   | Dir (name, _) -> dir_char ^ " " ^ pad name
 
-let current_level_to_doc (cursor : Fs.cursor) has_next =
+let current_level_to_doc (cursor : Fs.cursor) ~has_next =
   let open Pretty in
   let max_name_len = max_file_name_len cursor.files in
   let max_len = max_name_len + file_name_padding in
@@ -144,17 +155,29 @@ let children_to_doc ~prev_total ~pos children =
 
   row [ connector_doc; files_doc ]
 
+type next_level =
+  | Empty_directory
+  | Directory_contents of Pretty.doc
+  | File_contents of Pretty.doc
+
+let is_directory_contents = function
+  | Directory_contents _ -> true
+  | _ -> false
+
 let next_level_to_doc ~prev_total ~pos (selected_file : Fs.tree) =
   (* Get the next level files *)
   match selected_file with
   (* No children of a file *)
-  | File _ -> None
+  | File (file_name, file_contents) ->
+      File_contents (file_contents_to_doc ~file_name ~file_contents)
   (* No children of a directory without children *)
-  | Dir (_, [||]) -> None
+  | Dir (_, [||]) -> Empty_directory
   (* Non-empty array of children *)
-  | Dir (_, children) -> Some (children_to_doc ~prev_total ~pos children)
+  | Dir (_, children) ->
+      Directory_contents (children_to_doc ~prev_total ~pos children)
 
-let fs (fs : Fs.zipper) =
+let fs (code_tab : Model.code_tab) =
+  let fs = code_tab.fs in
   let current = fs.current in
   let next_level_doc =
     next_level_to_doc
@@ -162,8 +185,10 @@ let fs (fs : Fs.zipper) =
       ~pos:current.pos (Fs.file_at current)
   in
   let current_level_doc =
-    current_level_to_doc current (Option.is_some next_level_doc)
+    current_level_to_doc current
+      ~has_next:(is_directory_contents next_level_doc)
   in
   match next_level_doc with
-  | None -> current_level_doc
-  | Some next_level_doc -> Pretty.row [ current_level_doc; next_level_doc ]
+  | Empty_directory -> current_level_doc
+  | Directory_contents next_level_doc | File_contents next_level_doc ->
+      Pretty.row [ current_level_doc; next_level_doc ]

@@ -1,6 +1,6 @@
 type code_tab = {
-  (* Repository directory *)
-  dirname : string;
+  (* Full path to the repository directory *)
+  root_dir_path : string;
   (* Zipper of the repository code *)
   fs : Fs.zipper;
 }
@@ -20,17 +20,17 @@ type t = {
 
 type initial_data = {
   repo : string;
-  dirname : string;
+  root_dir_path : string;
   files : Fs.tree array;
   terminal_rows : int;
   terminal_cols : int;
 }
 
-let initial_model { repo; dirname; files; terminal_rows; terminal_cols } =
+let initial_model { repo; root_dir_path; files; terminal_rows; terminal_cols } =
   {
     terminal_rows;
     terminal_cols;
     repo;
     current_tab = Code;
-    code_tab = { dirname; fs = Fs.zip_it files };
+    code_tab = { root_dir_path; fs = Fs.zip_it files };
   }

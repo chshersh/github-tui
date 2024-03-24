@@ -21,6 +21,7 @@
    dune
    (ANSITerminal (>= "0.8.5"))
    (cmdliner (>= "1.2.0"))
+   core_unix
    (ezcurl (>= "0.2.4"))
    (minttea (>= "0.0.2"))
    (terminal_size (>= "0.2.0"))

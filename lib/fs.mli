@@ -1,6 +1,6 @@
 (** A definition of a file tree. *)
 type tree =
-  | File of string
+  | File of string * string lazy_t
   | Dir of string * tree array
 
 (** Return the name of a given tree node. *)
