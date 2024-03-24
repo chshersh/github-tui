@@ -16,13 +16,14 @@
  (name github_tui)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends 
+ (depends
    (ocaml (>= "5.1"))
    dune
    (ANSITerminal (>= "0.8.5"))
    (cmdliner (>= "1.2.0"))
    (ezcurl (>= "0.2.4"))
    (minttea (>= "0.0.2"))
+   (terminal_size (>= "0.2.0"))
    uuseg
  )
  (tags

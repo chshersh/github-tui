@@ -2,4 +2,4 @@
 
 (library
  (name github_tui)
- (libraries ANSITerminal cmdliner ezcurl minttea uuseg.string))
+ (libraries ANSITerminal cmdliner ezcurl minttea terminal_size uuseg.string))
