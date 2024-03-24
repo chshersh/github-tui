@@ -16,5 +16,11 @@ type t = {
   code_tab : code_tab;
 }
 
-let initial_model ~repo ~dirname ~files =
+type initial_data = {
+  repo : string;
+  dirname : string;
+  files : Fs.tree array;
+}
+
+let initial_model { repo; dirname; files } =
   { repo; current_tab = Code; code_tab = { dirname; fs = Fs.zip_it files } }
