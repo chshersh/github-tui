@@ -10,8 +10,8 @@ let debug_section (model : Model.t) =
 
 let tabs_section cur_tab =
   let open Pretty in
-  let sep = col [ str " "; str " "; str "─" ] in
-  row
+  let sep = vertical [ str " "; str " "; str "─" ] in
+  horizontal
     [
       Widget.code_tab ~is_selected:(cur_tab = Model.Code);
       sep;
@@ -25,7 +25,7 @@ let code_section (code_tab : Model.code_tab) =
     Widget.pwd code_tab.root_dir_path (Fs.zipper_parents code_tab.fs)
   in
   let fs_doc = Widget.fs code_tab in
-  Pretty.col [ current_path_doc; fs_doc ]
+  Pretty.vertical [ current_path_doc; fs_doc ]
 
 let tab_content_section (model : Model.t) =
   match model.current_tab with
@@ -40,6 +40,6 @@ let to_doc (model : Model.t) =
   let tabs = tabs_section model.current_tab in
   let content = tab_content_section model in
 
-  col [ row [ repo; str " "; debug ]; empty; tabs; content; empty ]
+  vertical [ horizontal [ repo; str " "; debug ]; empty; tabs; content; empty ]
 
 let view (model : Model.t) = model |> to_doc |> Pretty.render

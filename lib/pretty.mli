@@ -11,10 +11,10 @@ val str : string -> doc
 val fmt : styles -> string -> doc
 
 (** Put all documents in a list horizontally, automatically adding required padding. *)
-val row : doc list -> doc
+val horizontal : doc list -> doc
 
 (** Put all documents in a list vertically after each other with a line separator. *)
-val col : doc list -> doc
+val vertical : doc list -> doc
 
 (** Render the resulting document. *)
 val render : doc -> string

@@ -4,7 +4,7 @@ let style_directory = ANSITerminal.[ Bold; magenta ]
 let tab_doc ~is_selected tab_lines =
   let open Pretty in
   let format = if is_selected then fmt style_selected else str in
-  tab_lines |> List.map format |> col
+  tab_lines |> List.map format |> vertical
 
 let code_tab ~is_selected =
   tab_doc ~is_selected
@@ -48,9 +48,9 @@ let file_contents_to_doc ~file_name:_ ~file_contents =
     |> String.split_on_char '\n'
     |> List_extra.take 30
     |> List.map Pretty.str
-    |> Pretty.col
+    |> Pretty.vertical
   in
-  Pretty.(row [ str " "; file_contents_preview ])
+  Pretty.(horizontal [ str " "; file_contents_preview ])
 
 (* Extra padding for:
 
@@ -102,7 +102,7 @@ let current_level_to_doc (cursor : Fs.cursor) ~has_next =
          if i = hi_pos - 1 || i = hi_pos || i = hi_pos + 1 then
            fmt style_selected s
          else str s)
-  |> col
+  |> vertical
 
 let children_to_doc ~prev_total ~pos children =
   let open Pretty in
@@ -121,7 +121,7 @@ let children_to_doc ~prev_total ~pos children =
     List_extra.generate prev_rows_count (fun i ->
         let is_current_pos = i = connect_pos in
         if is_current_pos then str "─" else str " ")
-    |> col
+    |> vertical
   in
 
   (* Formatting single file name *)
@@ -150,10 +150,10 @@ let children_to_doc ~prev_total ~pos children =
          in
          pad_before @ lines)
     |> List.map str
-    |> col
+    |> vertical
   in
 
-  row [ connector_doc; files_doc ]
+  horizontal [ connector_doc; files_doc ]
 
 type next_level =
   | Empty_directory
@@ -191,4 +191,4 @@ let fs (code_tab : Model.code_tab) =
   match next_level_doc with
   | Empty_directory -> current_level_doc
   | Directory_contents next_level_doc | File_contents next_level_doc ->
-      Pretty.row [ current_level_doc; next_level_doc ]
+      Pretty.horizontal [ current_level_doc; next_level_doc ]

@@ -3,21 +3,14 @@
 type styles = ANSITerminal.style list
 
 type doc =
-  | Empty
   | Str of styles * string
-  | Vertical of doc * doc
-  | Horizontal of doc * doc
+  | Vertical of doc list
+  | Horizontal of doc list
 
 let str string = Str ([], string)
 let fmt styles string = Str (styles, string)
-
-let row = function
-  | [] -> Empty
-  | hd :: tl -> List.fold_left (fun l r -> Horizontal (l, r)) hd tl
-
-let col = function
-  | [] -> Empty
-  | hd :: tl -> List.fold_left (fun l r -> Vertical (l, r)) hd tl
+let horizontal cols = Horizontal cols
+let vertical rows = Vertical rows
 
 type chunk = {
   styles : styles;
@@ -69,11 +62,16 @@ let zip_lines (l : line list) (r : line list) =
   zip l r
 
 let rec render_to_lines = function
-  | Empty -> []
   | Str (styles, string) -> [ { chunks = [ { styles; string } ] } ]
-  | Vertical (top, bottom) -> render_to_lines top @ render_to_lines bottom
-  | Horizontal (left, right) ->
-      zip_lines (render_to_lines left) (render_to_lines right)
+  | Vertical rows -> List.concat_map render_to_lines rows
+  | Horizontal cols -> (
+      match cols with
+      | [] -> []
+      (* TODO: This is potentially really slow; optimise *)
+      | hd :: tl ->
+          List.fold_left
+            (fun acc col -> zip_lines acc (render_to_lines col))
+            (render_to_lines hd) tl)
 
 let render doc =
   doc |> render_to_lines |> List.map fmt_line |> String_extra.unlines
