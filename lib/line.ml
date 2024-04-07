@@ -8,8 +8,10 @@ type chunk = {
 let fmt_chunk { styles; string } = ANSITerminal.sprintf styles "%s" string
 
 let padding_chunk width =
-  let padding = String.make width ' ' in
-  { styles = []; string = padding }
+  if width <= 0 then { styles = []; string = "" }
+  else
+    let padding = String.make width ' ' in
+    { styles = []; string = padding }
 
 type t = {
   chunks : chunk list;

@@ -3,9 +3,7 @@ let style_selected = ANSITerminal.[ Bold; green ]
 let style_directory = ANSITerminal.[ Bold; magenta ]
 
 let debug_section (model : Model.t) =
-  let debug_info =
-    Printf.sprintf "%dw x %dh" model.width model.height
-  in
+  let debug_info = Printf.sprintf "%dw x %dh" model.width model.height in
   Pretty.str debug_info
 
 let tabs_section cur_tab =
@@ -28,9 +26,12 @@ let code_section (code_tab : Model.code_tab) =
   Pretty.vertical [ current_path_doc; fs_doc ]
 
 let tab_content_section (model : Model.t) =
-  match model.current_tab with
-  | Code -> code_section model.code_tab
-  | Issues | PullRequests -> Pretty.str ""
+  let tab_doc =
+    match model.current_tab with
+    | Code -> code_section model.code_tab
+    | Issues | PullRequests -> Pretty.str ""
+  in
+  Pretty.(horizontal [ tab_doc; horizontal_fill; str "This is test" ])
 
 let to_doc (model : Model.t) =
   let open Pretty in

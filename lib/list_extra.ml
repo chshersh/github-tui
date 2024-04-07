@@ -15,3 +15,5 @@ let rec take n = function
   | _ when n <= 0 -> []
   | [] -> []
   | x :: xs -> x :: take (n - 1) xs
+
+let max_on f list = List.fold_left (fun acc x -> max acc (f x)) 0 list
