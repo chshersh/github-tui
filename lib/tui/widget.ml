@@ -1,6 +1,19 @@
 let style_selected = ANSITerminal.[ Bold; green ]
 let style_directory = ANSITerminal.[ Bold; magenta ]
 
+let about_doc =
+  let widget =
+    [
+      "┌─────╼ About ╾─────┐";
+      "│ GitHub TUI v0.1.0 │";
+      "│ :h - help         │";
+      "└───────────────────┘";
+    ]
+  in
+  let open Pretty in
+  widget |> List.map (fmt ANSITerminal.[ cyan ]) |> vertical
+  [@@ocamlformat "disable"]
+
 let tab_doc ~is_selected tab_lines =
   let open Pretty in
   let format = if is_selected then fmt style_selected else str in

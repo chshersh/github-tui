@@ -31,7 +31,7 @@ let tab_content_section (model : Model.t) =
     | Code -> code_section model.code_tab
     | Issues | PullRequests -> Pretty.str ""
   in
-  Pretty.(horizontal [ tab_doc; horizontal_fill; str "This is test" ])
+  Pretty.(horizontal [ tab_doc; horizontal_fill; Widget.about_doc ])
 
 let to_doc (model : Model.t) =
   let open Pretty in

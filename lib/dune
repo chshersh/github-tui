@@ -8,5 +8,6 @@
   core_unix.command_unix
   ezcurl
   minttea
+  shape-the-term
   terminal_size
   uuseg.string))
