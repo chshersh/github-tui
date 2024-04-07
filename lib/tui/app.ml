@@ -7,11 +7,11 @@ let init ~repo ~root_dir_path : Model.initial_data =
         exit 1
     | Fs.Dir (_, files) -> files
   in
-  let terminal_rows = Option.value (Terminal_size.get_rows ()) ~default:120 in
-  let terminal_cols =
+  let height = Option.value (Terminal_size.get_rows ()) ~default:120 in
+  let width =
     Option.value (Terminal_size.get_columns ()) ~default:140
   in
-  { repo; root_dir_path; files; terminal_rows; terminal_cols }
+  { repo; root_dir_path; files; width; height }
 
 let app = Minttea.app ~init:Init.init ~update:Update.update ~view:View.view ()
 

@@ -11,8 +11,8 @@ type tab =
   | PullRequests
 
 type t = {
-  terminal_rows : int;
-  terminal_cols : int;
+  width : int;
+  height : int;
   repo : string;
   current_tab : tab;
   code_tab : code_tab;
@@ -22,14 +22,14 @@ type initial_data = {
   repo : string;
   root_dir_path : string;
   files : Fs.tree array;
-  terminal_rows : int;
-  terminal_cols : int;
+  width : int;
+  height : int;
 }
 
-let initial_model { repo; root_dir_path; files; terminal_rows; terminal_cols } =
+let initial_model { repo; root_dir_path; files; width; height } =
   {
-    terminal_rows;
-    terminal_cols;
+    width;
+    height;
     repo;
     current_tab = Code;
     code_tab = { root_dir_path; fs = Fs.zip_it files };

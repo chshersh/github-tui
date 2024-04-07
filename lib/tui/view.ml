@@ -4,7 +4,7 @@ let style_directory = ANSITerminal.[ Bold; magenta ]
 
 let debug_section (model : Model.t) =
   let debug_info =
-    Printf.sprintf "%dw x %dh" model.terminal_cols model.terminal_rows
+    Printf.sprintf "%dw x %dh" model.width model.height
   in
   Pretty.str debug_info
 
@@ -42,4 +42,4 @@ let to_doc (model : Model.t) =
 
   vertical [ horizontal [ repo; str " "; debug ]; empty; tabs; content; empty ]
 
-let view (model : Model.t) = model |> to_doc |> Pretty.render
+let view (model : Model.t) = model |> to_doc |> Pretty.render ~width:model.width
