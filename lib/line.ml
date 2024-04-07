@@ -23,14 +23,14 @@ let length line = line.length
 let of_chunks chunks =
   let length =
     List.fold_left
-      (fun acc { string; _ } -> acc + String_extra.graphemes_len string)
+      (fun acc { string; _ } -> acc + String_extra.width string)
       0 chunks
   in
   { chunks; length }
 
 let prepend_chunk chunk line =
   let chunks = chunk :: line.chunks in
-  let length = String_extra.graphemes_len chunk.string + line.length in
+  let length = String_extra.width chunk.string + line.length in
   { chunks; length }
 
 let append line1 line2 =

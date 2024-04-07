@@ -78,7 +78,7 @@ let file_name_padding = 6
 
 let max_file_name_len files =
   files
-  |> Array.map (fun file -> file |> Fs.file_name |> String_extra.graphemes_len)
+  |> Array.map (fun file -> file |> Fs.file_name |> String_extra.width)
   |> Array.fold_left max 0
 
 let fmt_file ~max_name_len (tree : Fs.tree) =
