@@ -1,4 +1,4 @@
 pin-depends: [
-  ["minttea.dev" "git+https://github.com/leostera/minttea"]
+  ["minttea.dev" "git+https://github.com/chshersh/minttea"]
   ["shape-the-term.dev" "git+https://github.com/jmcavanillas/shape-the-term"]
 ]
