@@ -17,10 +17,8 @@ let tabs_section cur_tab =
     ]
 
 let code_section (code_tab : Model.code_tab) =
-  let current_path_doc =
-    Widget.pwd code_tab.root_dir_path (Fs.zipper_parents code_tab.fs)
-  in
-  let fs_doc = Widget.fs code_tab in
+  let current_path_doc = Widget.pwd code_tab.root_dir_path code_tab.fs in
+  let fs_doc = Widget.file_view code_tab.fs in
   Pretty.vertical [ current_path_doc; fs_doc ]
 
 let tab_content_section (model : Model.t) =

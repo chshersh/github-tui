@@ -1,5 +1,6 @@
 let style_selected = ANSITerminal.[ Bold; green ]
 let style_directory = ANSITerminal.[ Bold; magenta ]
+let style_chosen = ANSITerminal.[ Bold; magenta ]
 
 let about_doc (model: Model.t) =
   let widget =
@@ -62,15 +63,14 @@ let file_char = "\u{f4a5}"
 let parents_path parents =
   List.fold_left (fun acc cur -> Filename.concat acc cur) "" (List.rev parents)
 
-let pwd root_dir_path parents =
+let pwd root_dir_path (fs : Fs.zipper) =
+  let parents = Fs.zipper_parents fs in
   let pwd_path = parents_path parents in
   let root_dir_name = Filename.basename root_dir_path in
   let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
   Pretty.fmt style_directory full_path
 
-let file_contents_to_doc ~file_contents =
-  let (file_contents : Fs.file_contents) = Lazy.force file_contents in
-
+let file_contents_to_doc ~(file_contents : Fs.file_contents) =
   let lines = Array.length file_contents.lines in
   let span = 40 in
   let offset = file_contents.offset in
@@ -106,7 +106,7 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
   | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
   | Dir (name, _) -> dir_char ^ " " ^ pad name
 
-let current_level_to_doc (cursor : Fs.cursor) ~has_next =
+let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   let open Pretty in
   let max_name_len = max_file_name_len cursor.files in
   let max_len = max_name_len + file_name_padding in
@@ -121,6 +121,8 @@ let current_level_to_doc (cursor : Fs.cursor) ~has_next =
   let fmt_name file = "│ " ^ fmt_file ~max_name_len file ^ " │" in
   let hi_pos = (2 * cursor.pos) + 1 in
 
+  let style = if is_file_chosen then style_chosen else style_selected in
+
   (* Combine *)
   cursor.files
   |> Array.to_list
@@ -130,8 +132,7 @@ let current_level_to_doc (cursor : Fs.cursor) ~has_next =
   |> List_extra.in_between ~sep:mid
   |> (fun lines -> [ top ] @ lines @ [ bot ])
   |> List.mapi (fun i s ->
-         if i = hi_pos - 1 || i = hi_pos || i = hi_pos + 1 then
-           fmt style_selected s
+         if i = hi_pos - 1 || i = hi_pos || i = hi_pos + 1 then fmt style s
          else str s)
   |> vertical
 
@@ -193,29 +194,68 @@ let is_directory_contents = function
   | Directory_contents _ -> true
   | _ -> false
 
-let next_level_to_doc ~prev_total ~pos (selected_file : Fs.tree) =
+type selected_node =
+  | File_selected of Fs.file_contents
+  | Dir_selected of {
+      prev_total : int;
+      pos : int;
+      children : Fs.tree array;
+    }
+
+let next_level_to_doc selected_node =
   (* Get the next level files *)
-  match selected_file with
-  (* No children of a file *)
-  | File (_file_name, file_contents) ->
+  match selected_node with
+  | File_selected file_contents ->
       File_contents (file_contents_to_doc ~file_contents)
   (* No children of a directory without children *)
-  | Dir (_, [||]) -> Empty_directory
+  | Dir_selected { children = [||]; _ } -> Empty_directory
   (* Non-empty array of children *)
-  | Dir (_, children) ->
+  | Dir_selected { prev_total; pos; children } ->
       Directory_contents (children_to_doc ~prev_total ~pos children)
 
-let fs (code_tab : Model.code_tab) =
-  let fs = code_tab.fs in
-  let current = fs.current in
-  let next_level_doc =
-    next_level_to_doc
-      ~prev_total:(Array.length current.files)
-      ~pos:current.pos (Fs.file_at current)
+type fs_view = {
+  left : Fs.dir_cursor;
+  right : selected_node;
+  is_file_chosen : bool;
+}
+
+let fs_to_view (fs : Fs.zipper) =
+  let is_file_chosen =
+    match fs.current with
+    | File_cursor _ -> true
+    | Dir_cursor _ -> false
   in
+
+  let left, right =
+    match (fs.current, fs.parents) with
+    | File_cursor _, [] ->
+        failwith
+          "Error during rendering! Impossible to have a file without a parent"
+    | File_cursor (_, contents), parent :: _ -> (parent, File_selected contents)
+    | Dir_cursor cursor, _ -> (
+        match Fs.file_at cursor with
+        | File (_, contents) -> (cursor, File_selected (Lazy.force contents))
+        | Dir (_, children) ->
+            ( cursor,
+              Dir_selected
+                {
+                  children;
+                  prev_total = Array.length cursor.files;
+                  pos = cursor.pos;
+                } ))
+  in
+
+  { left; right; is_file_chosen }
+
+let file_view (fs : Fs.zipper) =
+  let view = fs_to_view fs in
+
+  let next_level_doc = next_level_to_doc view.right in
+
   let current_level_doc =
-    current_level_to_doc current
+    current_level_to_doc view.left
       ~has_next:(is_directory_contents next_level_doc)
+      ~is_file_chosen:view.is_file_chosen
   in
   match next_level_doc with
   | Empty_directory -> current_level_doc

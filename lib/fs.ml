@@ -57,51 +57,81 @@ let rec to_tree path =
 
 let read_tree path = path |> to_tree |> sort_tree
 
-type cursor = {
+type dir_cursor = {
   pos : int;
   files : tree array;
 }
 
+type cursor =
+  | Dir_cursor of dir_cursor
+  | File_cursor of string * file_contents
+
 let file_at cursor = cursor.files.(cursor.pos)
 
 type zipper = {
-  parents : cursor list;
+  parents : dir_cursor list;
   current : cursor;
 }
 
-let zip_it trees = { parents = []; current = { pos = 0; files = trees } }
+let zip_it trees =
+  { parents = []; current = Dir_cursor { pos = 0; files = trees } }
 
 let zipper_parents zipper =
   List.map (fun cursor -> file_name (file_at cursor)) zipper.parents
 
+(* TODO: Horrible hardcoding of maximum lines view *)
+let span = 40
+
 let go_down zipper =
-  let cursor = zipper.current in
-  let len = Array.length cursor.files in
-  let new_pos = (cursor.pos + 1) mod len in
-  let new_cursor = { cursor with pos = new_pos } in
-  { zipper with current = new_cursor }
+  match zipper.current with
+  | Dir_cursor cursor ->
+      let len = Array.length cursor.files in
+      let new_pos = (cursor.pos + 1) mod len in
+      let new_cursor = Dir_cursor { cursor with pos = new_pos } in
+      { zipper with current = new_cursor }
+  | File_cursor (name, cursor) ->
+      let new_offset = cursor.offset + 1 in
+      let new_cursor =
+        File_cursor (name, { cursor with offset = new_offset })
+      in
+      let len = Array.length cursor.lines in
+      if new_offset + span > len then zipper
+      else { zipper with current = new_cursor }
 
 let go_up zipper =
-  let cursor = zipper.current in
-  let len = Array.length cursor.files in
-  let new_pos = (cursor.pos + len - 1) mod len in
-  let new_cursor = { cursor with pos = new_pos } in
-  { zipper with current = new_cursor }
+  match zipper.current with
+  | Dir_cursor cursor ->
+      let len = Array.length cursor.files in
+      let new_pos = (cursor.pos + len - 1) mod len in
+      let new_cursor = Dir_cursor { cursor with pos = new_pos } in
+      { zipper with current = new_cursor }
+  | File_cursor (name, cursor) ->
+      let new_offset = max 0 (cursor.offset - 1) in
+      let new_cursor =
+        File_cursor (name, { cursor with offset = new_offset })
+      in
+      { zipper with current = new_cursor }
 
 let go_next zipper =
-  let cursor = zipper.current in
-  let next = file_at cursor in
-  match next with
-  | File _ -> zipper
-  | Dir (_, next) ->
-      if Array.length next = 0 then zipper
-      else
-        {
-          parents = cursor :: zipper.parents;
-          current = { pos = 0; files = next };
-        }
+  match zipper.current with
+  | File_cursor _ -> zipper
+  | Dir_cursor cursor -> (
+      let next = file_at cursor in
+      match next with
+      | File (name, contents) ->
+          {
+            parents = cursor :: zipper.parents;
+            current = File_cursor (name, Lazy.force contents);
+          }
+      | Dir (_, next) ->
+          if Array.length next = 0 then zipper
+          else
+            {
+              parents = cursor :: zipper.parents;
+              current = Dir_cursor { pos = 0; files = next };
+            })
 
 let go_back zipper =
   match zipper.parents with
   | [] -> zipper
-  | current :: parents -> { parents; current }
+  | current :: parents -> { parents; current = Dir_cursor current }

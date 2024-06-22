@@ -16,17 +16,21 @@ val file_name : tree -> string
 val read_tree : string -> tree
 
 (** A cursor for files inside a single directory. *)
-type cursor = {
+type dir_cursor = {
   pos : int;
   files : tree array;
 }
 
+type cursor =
+  | Dir_cursor of dir_cursor
+  | File_cursor of string * file_contents
+
 (** Return the currently selected file in file cursor. *)
-val file_at : cursor -> tree
+val file_at : dir_cursor -> tree
 
 (** A file tree zipper that allows to traverse the tree in four directions. *)
 type zipper = {
-  parents : cursor list;
+  parents : dir_cursor list;
   current : cursor;
 }
 
