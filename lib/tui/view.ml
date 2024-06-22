@@ -2,10 +2,6 @@ let style_repo = ANSITerminal.[ Bold; blue ]
 let style_selected = ANSITerminal.[ Bold; green ]
 let style_directory = ANSITerminal.[ Bold; magenta ]
 
-let debug_section (model : Model.t) =
-  let debug_info = Printf.sprintf "%dw x %dh" model.width model.height in
-  Pretty.str debug_info
-
 let tabs_section cur_tab =
   let open Pretty in
   let sep = vertical [ str " "; str " "; str "─" ] in
@@ -31,16 +27,17 @@ let tab_content_section (model : Model.t) =
     | Code -> code_section model.code_tab
     | Issues | PullRequests -> Pretty.str ""
   in
-  Pretty.(horizontal [ tab_doc; horizontal_fill; Widget.about_doc ])
+  tab_doc
 
 let to_doc (model : Model.t) =
   let open Pretty in
   let empty = str "" in
-  let debug = debug_section model in
+  let about = Widget.about_doc model in
   let repo = fmt style_repo model.repo in
   let tabs = tabs_section model.current_tab in
   let content = tab_content_section model in
 
-  vertical [ horizontal [ repo; str " "; debug ]; empty; tabs; content; empty ]
+  vertical
+    [ repo; empty; tabs; horizontal [ content; horizontal_fill; about ]; empty ]
 
 let view (model : Model.t) = model |> to_doc |> Pretty.render ~width:model.width
