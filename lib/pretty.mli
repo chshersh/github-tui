@@ -18,7 +18,7 @@ val vertical : doc list -> doc
 Only one [horizontal_fill] is allowed per [horizontal] element. The first one
 will be used, the remaining ones will be ignored.
 *)
-val horizontal_fill : doc
+val horizontal_fill : char -> doc
 
 (** Render the resulting document.
 

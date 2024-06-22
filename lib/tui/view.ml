@@ -38,6 +38,12 @@ let to_doc (model : Model.t) =
   let content = tab_content_section model in
 
   vertical
-    [ repo; empty; tabs; horizontal [ content; horizontal_fill; about ]; empty ]
+    [
+      repo;
+      empty;
+      tabs;
+      horizontal [ content; horizontal_fill ' '; about ];
+      empty;
+    ]
 
 let view (model : Model.t) = model |> to_doc |> Pretty.render ~width:model.width

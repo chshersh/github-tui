@@ -7,10 +7,10 @@ type chunk = {
 
 let fmt_chunk { styles; string } = ANSITerminal.sprintf styles "%s" string
 
-let padding_chunk width =
+let replicate_chunk width c =
   if width <= 0 then { styles = []; string = "" }
   else
-    let padding = String.make width ' ' in
+    let padding = String.make width c in
     { styles = []; string = padding }
 
 type t = {
