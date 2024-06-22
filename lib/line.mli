@@ -7,8 +7,8 @@ type chunk = {
   string : string;
 }
 
-(** [replicate_chunk n c] creates a [chunk] without formatting of [n] repeated characters [c]. *)
-val replicate_chunk : int -> char -> chunk
+(** [replicate_chunk n s] creates a [chunk] without formatting of [n] repeated strings [s]. *)
+val replicate_chunk : int -> string -> chunk
 
 (** A type defining a single line of text with different parts ("chunks") having
 potentially different formatting. *)

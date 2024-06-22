@@ -1,6 +1,6 @@
 type doc =
   | Str of Line.styles * string
-  | Horizontal_fill of char
+  | Horizontal_fill of string
   | Vertical of doc list
   | Horizontal of doc list
 
@@ -19,7 +19,7 @@ let zip_lines (l : Line.t list) (r : Line.t list) =
     | [], r ->
         (* Optimisation: Add extra chunk only if padding is needed *)
         if max_len_l > 0 then
-          let padding_chunk = Line.replicate_chunk max_len_l ' ' in
+          let padding_chunk = Line.replicate_chunk max_len_l " " in
           List.map (Line.prepend_chunk padding_chunk) r
         else r
     | hd_l :: tl_l, hd_r :: tl_r ->
@@ -30,7 +30,7 @@ let zip_lines (l : Line.t list) (r : Line.t list) =
           let new_line = Line.append hd_l hd_r in
           new_line :: zip tl_l tl_r
         else
-          let padding_chunk = Line.replicate_chunk (max_len_l - left_len) ' ' in
+          let padding_chunk = Line.replicate_chunk (max_len_l - left_len) " " in
           let new_line =
             Line.append hd_l
               (Line.append (Line.of_chunks [ padding_chunk ]) hd_r)
@@ -40,14 +40,9 @@ let zip_lines (l : Line.t list) (r : Line.t list) =
 
   zip l r
 
-type prerender_pass_info = {
-  has_fill : bool;
-  size_taken : int;
-}
-
 type prerender =
   | Rendered of Line.t list
-  | Fill of char
+  | Fill of string
 
 let rec render_to_lines ~width = function
   | Str (styles, string) -> [ Line.of_chunks [ { styles; string } ] ]
@@ -59,32 +54,26 @@ let rec render_to_lines ~width = function
 and horizontal_to_lines ~width cols =
   (* Step [prerender]. Check if there's Horizontal_fill, render everything else
      and calculate rendered size. *)
-  let pass_info, prerendered =
+  let size_taken, prerendered =
     List.fold_left
-      (fun (pass_info, prerendered) col ->
-        let new_pass_info, new_prerendered =
+      (fun (size_taken, prerendered) col ->
+        let new_size_taken, new_prerendered =
           match col with
-          | Horizontal_fill filler ->
-              ( { has_fill = true; size_taken = pass_info.size_taken },
-                Fill filler )
+          | Horizontal_fill filler -> (size_taken, Fill filler)
           | other ->
-              (* WARNING: This will pass the total width to the left-most Horizontal_fill *)
-              let rendered = render_to_lines ~width other in
+              (* WARNING: The leftmost horizontal fill will consume all the remaining width *)
+              let remaining_width = width - size_taken in
+              let rendered = render_to_lines ~width:remaining_width other in
               let max_line_width = List_extra.max_on Line.length rendered in
-              ( {
-                  has_fill = pass_info.has_fill;
-                  size_taken = pass_info.size_taken + max_line_width;
-                },
-                Rendered rendered )
+              (size_taken + max_line_width, Rendered rendered)
         in
-        (* TODO: This is suboptimal *)
-        (new_pass_info, prerendered @ [ new_prerendered ]))
-      ({ has_fill = false; size_taken = 0 }, [])
-      cols
+        (* TODO: Adding to the end of the list is suboptimal *)
+        (new_size_taken, prerendered @ [ new_prerendered ]))
+      (0, []) cols
   in
 
   (* Step [fill_size]. Calculate the size of remaining fill *)
-  let fill_width = width - pass_info.size_taken in
+  let fill_width = width - size_taken in
 
   (* Step [fill]. Fill the first Horizontal_fill *)
   let _, rendered =

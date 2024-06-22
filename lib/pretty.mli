@@ -13,12 +13,13 @@ val horizontal : doc list -> doc
 (** Put all documents in a list vertically after each other with a line separator. *)
 val vertical : doc list -> doc
 
-(** Fill all the empty horizontal space with spaces. Useful for alignment.
+(** [horizontal_fill filler] fills all the empty horizontal space with the given
+string [filler]. Useful for alignment or separators.
 
-Only one [horizontal_fill] is allowed per [horizontal] element. The first one
+{b NOTE:} Only one [horizontal_fill] is allowed per [horizontal] element. The first one
 will be used, the remaining ones will be ignored.
 *)
-val horizontal_fill : char -> doc
+val horizontal_fill : string -> doc
 
 (** Render the resulting document.
 

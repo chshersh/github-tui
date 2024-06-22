@@ -38,7 +38,7 @@ let pull_requests_tab ~is_selected =
   tab_doc ~is_selected
     [ "╭───────────────╮";
       "│ Pull Requests │";
-      "┴───────────────┘";
+      "┴───────────────┴";
     ] [@@ocamlformat "disable"]
 
 let pwd_char = "\u{e5fd}"

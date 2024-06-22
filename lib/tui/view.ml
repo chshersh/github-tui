@@ -5,6 +5,7 @@ let style_directory = ANSITerminal.[ Bold; magenta ]
 let tabs_section cur_tab =
   let open Pretty in
   let sep = vertical [ str " "; str " "; str "─" ] in
+  let line = vertical [ str " "; str " "; horizontal_fill "─" ] in
   horizontal
     [
       Widget.code_tab ~is_selected:(cur_tab = Model.Code);
@@ -12,6 +13,7 @@ let tabs_section cur_tab =
       Widget.issues_tab ~is_selected:(cur_tab = Model.Issues);
       sep;
       Widget.pull_requests_tab ~is_selected:(cur_tab = Model.PullRequests);
+      line;
     ]
 
 let code_section (code_tab : Model.code_tab) =
@@ -42,7 +44,7 @@ let to_doc (model : Model.t) =
       repo;
       empty;
       tabs;
-      horizontal [ content; horizontal_fill ' '; about ];
+      horizontal [ content; horizontal_fill " "; about ];
       empty;
     ]
 
