@@ -16,4 +16,5 @@ let app = Minttea.app ~init:Init.init ~update:Update.update ~view:View.view ()
 let start repo root_dir_path =
   let initial_data = init ~repo ~root_dir_path in
   let initial_model = Model.initial_model initial_data in
-  Minttea.start app ~initial_model
+  let config = Minttea.make_config ~fps:1 () in
+  Minttea.start ~config app ~initial_model
