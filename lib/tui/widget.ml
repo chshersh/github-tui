@@ -41,6 +41,19 @@ let pull_requests_tab ~is_selected =
       "┴───────────────┴";
     ] [@@ocamlformat "disable"]
 
+let scroll ~lines ~span ~offset =
+  let height = 40 in
+  let scroll = Scroll.make ~height ~span ~lines ~offset in
+  match scroll with
+  | None -> Pretty.str " "
+  | Some scroll ->
+      let sections = Scroll.to_sections scroll in
+      let before = List.init sections.before (fun _ -> Pretty.str "░") in
+      let scroll = List.init sections.scroll (fun _ -> Pretty.str "█") in
+      let after = List.init sections.after (fun _ -> Pretty.str "░") in
+      let scroll_bar = before @ scroll @ after in
+      Pretty.vertical scroll_bar
+
 let pwd_char = "\u{e5fd}"
 let dir_char = "\u{f4d4}"
 let empty_dir_char = "\u{f413}"
@@ -55,16 +68,20 @@ let pwd root_dir_path parents =
   let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
   Pretty.fmt style_directory full_path
 
-let file_contents_to_doc ~file_name:_ ~file_contents =
-  let file_contents_preview =
-    file_contents
-    |> Lazy.force
-    |> String.split_on_char '\n'
-    |> List_extra.take 30
-    |> List.map Pretty.str
-    |> Pretty.vertical
+let file_contents_to_doc ~file_contents =
+  let (file_contents : Fs.file_contents) = Lazy.force file_contents in
+
+  let lines = Array.length file_contents.lines in
+  let span = 40 in
+  let offset = file_contents.offset in
+
+  let contents_span =
+    List_extra.of_sub_array ~offset ~len:span file_contents.lines
   in
-  Pretty.(horizontal [ str " "; file_contents_preview ])
+
+  let scroll_doc = scroll ~lines ~span ~offset in
+  let contents_doc = Pretty.vertical contents_span in
+  Pretty.(horizontal [ scroll_doc; str " "; contents_doc ])
 
 (* Extra padding for:
 
@@ -132,7 +149,7 @@ let children_to_doc ~prev_total ~pos children =
   let prev_rows_count = (2 * prev_total) + 1 in
   let connect_pos = (2 * pos) + 1 in
   let connector_doc =
-    List_extra.generate prev_rows_count (fun i ->
+    List.init prev_rows_count (fun i ->
         let is_current_pos = i = connect_pos in
         if is_current_pos then str "─" else str " ")
     |> vertical
@@ -159,9 +176,7 @@ let children_to_doc ~prev_total ~pos children =
     |> List_extra.in_between ~sep:mid
     |> (fun lines -> [ top ] @ lines @ [ bot ])
     |> (fun lines ->
-         let pad_before =
-           List_extra.generate (max (connect_pos - 1) 0) (fun _ -> "")
-         in
+         let pad_before = List.init (max (connect_pos - 1) 0) (fun _ -> "") in
          pad_before @ lines)
     |> List.map str
     |> vertical
@@ -182,8 +197,8 @@ let next_level_to_doc ~prev_total ~pos (selected_file : Fs.tree) =
   (* Get the next level files *)
   match selected_file with
   (* No children of a file *)
-  | File (file_name, file_contents) ->
-      File_contents (file_contents_to_doc ~file_name ~file_contents)
+  | File (_file_name, file_contents) ->
+      File_contents (file_contents_to_doc ~file_contents)
   (* No children of a directory without children *)
   | Dir (_, [||]) -> Empty_directory
   (* Non-empty array of children *)

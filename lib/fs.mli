@@ -1,6 +1,12 @@
+(** File contents as an array of lines, where each line is wrapped into a document (for rendering efficiency) *)
+type file_contents = {
+  lines : Pretty.doc array;
+  offset : int;
+}
+
 (** A definition of a file tree. *)
 type tree =
-  | File of string * string lazy_t
+  | File of string * file_contents lazy_t
   | Dir of string * tree array
 
 (** Return the name of a given tree node. *)

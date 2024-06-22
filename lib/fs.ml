@@ -1,5 +1,10 @@
+type file_contents = {
+  lines : Pretty.doc array;
+  offset : int;
+}
+
 type tree =
-  | File of string * string lazy_t
+  | File of string * file_contents lazy_t
   | Dir of string * tree array
 
 let file_name = function
@@ -26,10 +31,18 @@ let rec sort_tree = function
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read_file_contents path =
   let cmd =
-    "bat --plain --color=always --italic-text=always --paging=never \
-     --terminal-width=80 " ^ path
+    "bat --style=numbers,changes --color=always --italic-text=always \
+     --paging=never --terminal-width=80 " ^ path
   in
-  Shell.proc_stdout cmd
+  let contents = Shell.proc_stdout cmd in
+  let lines =
+    contents
+    |> String.split_on_char '\n'
+    |> List.map Pretty.str
+    |> Array.of_list
+  in
+  let offset = 0 in
+  { lines; offset }
 
 let rec to_tree path =
   if Sys.is_directory path then

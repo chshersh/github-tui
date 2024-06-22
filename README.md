@@ -13,6 +13,14 @@ A TUI interface to GitHub.
 > `github-tui` is in _alpha_ stage of development!
 > Expect missing features and horrible bugs.
 
+## Prerequisites
+
+To use `github-tui`, you need to have the following installed:
+
+1. OCaml toolchain: to build the project
+1. `bat` version ⩾ 0.19.0
+1. [Hack Mono Nerd Font](https://www.nerdfonts.com/)
+
 ## Development
 
 Initialise the project when building for the first time:
