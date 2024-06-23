@@ -1,5 +1,5 @@
 type doc =
-  | Str of Line.styles * string
+  | Str of Chunk.styles * string
   | Horizontal_fill of string
   | Vertical of doc list
   | Horizontal of doc list
@@ -19,7 +19,7 @@ let zip_lines (l : Line.t list) (r : Line.t list) =
     | [], r ->
         (* Optimisation: Add extra chunk only if padding is needed *)
         if max_len_l > 0 then
-          let padding_chunk = Line.replicate_chunk max_len_l " " in
+          let padding_chunk = Chunk.replicate max_len_l " " in
           List.map (Line.prepend_chunk padding_chunk) r
         else r
     | hd_l :: tl_l, hd_r :: tl_r ->
@@ -30,7 +30,7 @@ let zip_lines (l : Line.t list) (r : Line.t list) =
           let new_line = Line.append hd_l hd_r in
           new_line :: zip tl_l tl_r
         else
-          let padding_chunk = Line.replicate_chunk (max_len_l - left_len) " " in
+          let padding_chunk = Chunk.replicate (max_len_l - left_len) " " in
           let new_line =
             Line.append hd_l
               (Line.append (Line.of_chunks [ padding_chunk ]) hd_r)
@@ -47,7 +47,7 @@ type prerender =
 let rec render_to_lines ~width = function
   | Str (styles, string) -> [ Line.of_chunks [ { styles; string } ] ]
   | Horizontal_fill filler ->
-      [ Line.of_chunks [ Line.replicate_chunk width filler ] ]
+      [ Line.of_chunks [ Chunk.replicate width filler ] ]
   | Vertical rows -> List.concat_map (render_to_lines ~width) rows
   | Horizontal cols -> horizontal_to_lines ~width cols
 
@@ -85,9 +85,7 @@ and horizontal_to_lines ~width cols =
             ( 0,
               rendered
               @ [
-                  [
-                    Line.(of_chunks [ replicate_chunk remaining_width filler ]);
-                  ];
+                  [ Line.of_chunks [ Chunk.replicate remaining_width filler ] ];
                 ] ))
       (fill_width, []) prerendered
   in
@@ -95,7 +93,7 @@ and horizontal_to_lines ~width cols =
   (* Step [combine]. Combine the final columns of lines. *)
   match rendered with
   | [] -> []
-  (* TODO: This is potentially really slow; optimise *)
+  (* TODO: This has quadratic time complexity; optimise *)
   | hd :: tl -> List.fold_left zip_lines hd tl
 
 let render ~width doc =

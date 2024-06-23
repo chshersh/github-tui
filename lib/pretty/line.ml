@@ -1,20 +1,5 @@
-type styles = ANSITerminal.style list
-
-type chunk = {
-  styles : styles;
-  string : string;
-}
-
-let fmt_chunk { styles; string } = ANSITerminal.sprintf styles "%s" string
-
-let replicate_chunk width s =
-  if width <= 0 then { styles = []; string = "" }
-  else
-    let filling = Extra.String.repeat_txt width s in
-    { styles = []; string = filling }
-
 type t = {
-  chunks : chunk list;
+  chunks : Chunk.t list;
   length : int;
 }
 
@@ -23,7 +8,7 @@ let length line = line.length
 let of_chunks chunks =
   let length =
     List.fold_left
-      (fun acc { string; _ } -> acc + Extra.String.width string)
+      (fun acc { Chunk.string; _ } -> acc + Extra.String.width string)
       0 chunks
   in
   { chunks; length }
@@ -38,4 +23,4 @@ let append line1 line2 =
   let length = line1.length + line2.length in
   { chunks; length }
 
-let fmt line = line.chunks |> List.map fmt_chunk |> String.concat ""
+let fmt line = line.chunks |> List.map Chunk.fmt |> String.concat ""

@@ -5,7 +5,7 @@ type doc
 val str : string -> doc
 
 (** Create a single chunk of string with formatting. *)
-val fmt : Line.styles -> string -> doc
+val fmt : Chunk.styles -> string -> doc
 
 (** Put all documents in a list horizontally, automatically adding required padding. *)
 val horizontal : doc list -> doc
