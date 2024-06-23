@@ -8,10 +8,11 @@ let path_arg =
   let doc = "Path to a local directory of a GitHub repository" in
   Arg.(
     value
-    & opt string "."
+    & opt (some string) None
     & info [ "d"; "directory" ] ~docv:"DIRECTORY_PATH" ~doc)
 
-let gh_tui_term = Term.(const Tui.start $ repo_arg $ path_arg)
+let run repo local_path = Tui.start ~repo ~local_path
+let gh_tui_term = Term.(const run $ repo_arg $ path_arg)
 
 let cmd =
   let doc = "TUI of a GitHub repository" in

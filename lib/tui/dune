@@ -7,4 +7,5 @@
   extra
   fs
   pretty
-  scroll))
+  scroll
+  shell))
