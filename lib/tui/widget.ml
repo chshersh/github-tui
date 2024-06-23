@@ -5,6 +5,9 @@ let about_doc (model: Model.t) =
       "│ GitHub TUI v0.1.0 │";
       "│ :h - help         │";
       Printf.sprintf "│ Size: %dw x %dh  │" model.width model.height;
+      "│ Moving around:    │";
+      "│   ←↓↑→            │";
+      "│   hjkl            │";
       "└───────────────────┘";
     ]
   in
