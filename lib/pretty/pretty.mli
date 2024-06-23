@@ -1,3 +1,5 @@
+module Style = Style
+
 (** A type representing a structured document. *)
 type doc
 
@@ -5,7 +7,7 @@ type doc
 val str : string -> doc
 
 (** Create a single chunk of string with formatting. *)
-val fmt : Chunk.styles -> string -> doc
+val fmt : Style.t -> string -> doc
 
 (** Put all documents in a list horizontally, automatically adding required padding. *)
 val horizontal : doc list -> doc

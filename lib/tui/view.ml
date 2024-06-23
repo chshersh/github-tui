@@ -1,7 +1,3 @@
-let style_repo = ANSITerminal.[ Bold; blue ]
-let style_selected = ANSITerminal.[ Bold; green ]
-let style_directory = ANSITerminal.[ Bold; magenta ]
-
 let tabs_section cur_tab =
   let open Pretty in
   let sep = vertical [ str " "; str " "; str "─" ] in
@@ -33,7 +29,7 @@ let to_doc (model : Model.t) =
   let open Pretty in
   let empty = str "" in
   let about = Widget.about_doc model in
-  let repo = fmt style_repo model.repo in
+  let repo = fmt Style.repo model.repo in
   let tabs = tabs_section model.current_tab in
   let content = tab_content_section model in
 

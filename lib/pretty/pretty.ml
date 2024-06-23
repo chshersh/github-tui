@@ -1,5 +1,7 @@
+module Style = Style
+
 type doc =
-  | Str of Chunk.styles * string
+  | Str of Style.t * string
   | Horizontal_fill of string
   | Vertical of doc list
   | Horizontal of doc list

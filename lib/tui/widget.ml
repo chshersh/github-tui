@@ -1,7 +1,3 @@
-let style_selected = ANSITerminal.[ Bold; green ]
-let style_directory = ANSITerminal.[ Bold; magenta ]
-let style_chosen = ANSITerminal.[ Bold; magenta ]
-
 let about_doc (model: Model.t) =
   let widget =
     [
@@ -18,7 +14,7 @@ let about_doc (model: Model.t) =
 
 let tab_doc ~is_selected tab_lines =
   let open Pretty in
-  let format = if is_selected then fmt style_selected else str in
+  let format = if is_selected then fmt Style.selected else str in
   tab_lines |> List.map format |> vertical
 
 let code_tab ~is_selected =
@@ -68,7 +64,7 @@ let pwd root_dir_path (fs : Fs.zipper) =
   let pwd_path = parents_path parents in
   let root_dir_name = Filename.basename root_dir_path in
   let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
-  Pretty.fmt style_directory full_path
+  Pretty.(fmt Style.directory full_path)
 
 let file_contents_to_doc ~(file_contents : Fs.file_contents) =
   let lines = Array.length file_contents.lines in
@@ -121,7 +117,7 @@ let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   let fmt_name file = "│ " ^ fmt_file ~max_name_len file ^ " │" in
   let hi_pos = (2 * cursor.pos) + 1 in
 
-  let style = if is_file_chosen then style_chosen else style_selected in
+  let style = if is_file_chosen then Style.chosen else Style.selected in
 
   (* Combine *)
   cursor.files

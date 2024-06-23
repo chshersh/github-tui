@@ -1,9 +1,6 @@
-(** Formatting of a string. *)
-type styles = ANSITerminal.style list
-
 (** A part of a line with the formatting added to it. *)
 type t = {
-  styles : styles;
+  styles : Style.t;
   string : string;
 }
 

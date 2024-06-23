@@ -1,7 +1,6 @@
 (library
  (name tui)
  (libraries
-  ANSITerminal
   minttea
   terminal_size
   ;; Internal dependencies

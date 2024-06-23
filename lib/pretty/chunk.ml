@@ -1,7 +1,5 @@
-type styles = ANSITerminal.style list
-
 type t = {
-  styles : styles;
+  styles : Style.t;
   string : string;
 }
 
