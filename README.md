@@ -2,16 +2,18 @@
 
 A TUI interface to GitHub.
 
+> [!WARNING]
+> `github-tui` is in _alpha_ stage of development!
+> Expect missing features and horrible bugs.
+>
+> Completion: Done 25%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
+
 > [!IMPORTANT]
 > **DISCLAIMER:** `github-ui` is developed and maintained in free time
 > voluntarily.  The development may continue for decades or may stop tomorrow. You
 > can use
 > [GitHub Sponsorship](https://github.com/sponsors/chshersh) to support
 > the development of this project.
-
-> [!WARNING]
-> `github-tui` is in _alpha_ stage of development!
-> Expect missing features and horrible bugs.
 
 ## Prerequisites
 
