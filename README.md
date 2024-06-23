@@ -6,7 +6,7 @@ A TUI interface to GitHub.
 > `github-tui` is in _alpha_ stage of development!
 > Expect missing features and horrible bugs.
 >
-> Completion: Done 25%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
+> **Completion**: Done 25%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
 
 > [!IMPORTANT]
 > **DISCLAIMER:** `github-ui` is developed and maintained in free time
