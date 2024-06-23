@@ -231,7 +231,7 @@ let fs_to_view (fs : Fs.zipper) =
     | File_cursor _, [] ->
         failwith
           "Error during rendering! Impossible to have a file without a parent"
-    | File_cursor (_, contents), parent :: _ -> (parent, File_selected contents)
+    | File_cursor contents, parent :: _ -> (parent, File_selected contents)
     | Dir_cursor cursor, _ -> (
         match Fs.file_at cursor with
         | File (_, contents) -> (cursor, File_selected (Lazy.force contents))

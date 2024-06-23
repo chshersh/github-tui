@@ -23,7 +23,7 @@ type dir_cursor = {
 
 type cursor =
   | Dir_cursor of dir_cursor
-  | File_cursor of string * file_contents
+  | File_cursor of file_contents
 
 (** Return the currently selected file in file cursor. *)
 val file_at : dir_cursor -> tree

@@ -64,7 +64,7 @@ type dir_cursor = {
 
 type cursor =
   | Dir_cursor of dir_cursor
-  | File_cursor of string * file_contents
+  | File_cursor of file_contents
 
 let file_at cursor = cursor.files.(cursor.pos)
 
@@ -89,11 +89,9 @@ let go_down zipper =
       let new_pos = (cursor.pos + 1) mod len in
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
-  | File_cursor (name, cursor) ->
+  | File_cursor cursor ->
       let new_offset = cursor.offset + 1 in
-      let new_cursor =
-        File_cursor (name, { cursor with offset = new_offset })
-      in
+      let new_cursor = File_cursor { cursor with offset = new_offset } in
       let len = Array.length cursor.lines in
       if new_offset + span > len then zipper
       else { zipper with current = new_cursor }
@@ -105,11 +103,9 @@ let go_up zipper =
       let new_pos = (cursor.pos + len - 1) mod len in
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
-  | File_cursor (name, cursor) ->
+  | File_cursor cursor ->
       let new_offset = max 0 (cursor.offset - 1) in
-      let new_cursor =
-        File_cursor (name, { cursor with offset = new_offset })
-      in
+      let new_cursor = File_cursor { cursor with offset = new_offset } in
       { zipper with current = new_cursor }
 
 let go_next zipper =
@@ -118,10 +114,10 @@ let go_next zipper =
   | Dir_cursor cursor -> (
       let next = file_at cursor in
       match next with
-      | File (name, contents) ->
+      | File (_name, contents) ->
           {
             parents = cursor :: zipper.parents;
-            current = File_cursor (name, Lazy.force contents);
+            current = File_cursor (Lazy.force contents);
           }
       | Dir (_, next) ->
           if Array.length next = 0 then zipper
