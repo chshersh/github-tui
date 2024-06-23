@@ -64,7 +64,7 @@ and horizontal_to_lines ~width cols =
               (* WARNING: The leftmost horizontal fill will consume all the remaining width *)
               let remaining_width = width - size_taken in
               let rendered = render_to_lines ~width:remaining_width other in
-              let max_line_width = List_extra.max_on Line.length rendered in
+              let max_line_width = Extra.List.max_on Line.length rendered in
               (size_taken + max_line_width, Rendered rendered)
         in
         (* TODO: Adding to the end of the list is suboptimal *)
@@ -99,4 +99,4 @@ and horizontal_to_lines ~width cols =
   | hd :: tl -> List.fold_left zip_lines hd tl
 
 let render ~width doc =
-  doc |> render_to_lines ~width |> List.map Line.fmt |> String_extra.unlines
+  doc |> render_to_lines ~width |> List.map Line.fmt |> Extra.String.unlines

@@ -11,7 +11,7 @@ let path_arg =
     & opt string "."
     & info [ "d"; "directory" ] ~docv:"DIRECTORY_PATH" ~doc)
 
-let gh_tui_term = Term.(const Tui.App.start $ repo_arg $ path_arg)
+let gh_tui_term = Term.(const Tui.start $ repo_arg $ path_arg)
 
 let cmd =
   let doc = "TUI of a GitHub repository" in

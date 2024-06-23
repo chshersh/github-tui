@@ -21,14 +21,10 @@
    dune
    (ANSITerminal (>= "0.8.5"))
    (cmdliner (>= "1.2.0"))
-   core_unix
    (ezcurl (>= "0.2.4"))
    (minttea (>= "0.0.2"))
    shape-the-term
    (terminal_size (>= "0.2.0"))
-   uuseg
  )
  (tags
   (tui cli git github)))
-
-; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

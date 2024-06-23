@@ -76,7 +76,7 @@ let file_contents_to_doc ~(file_contents : Fs.file_contents) =
   let offset = file_contents.offset in
 
   let contents_span =
-    List_extra.of_sub_array ~offset ~len:span file_contents.lines
+    Extra.List.of_sub_array ~offset ~len:span file_contents.lines
   in
 
   let scroll_doc = scroll ~lines ~span ~offset in
@@ -96,11 +96,11 @@ let file_name_padding = 6
 
 let max_file_name_len files =
   files
-  |> Array.map (fun file -> file |> Fs.file_name |> String_extra.width)
+  |> Array.map (fun file -> file |> Fs.file_name |> Extra.String.width)
   |> Array.fold_left max 0
 
 let fmt_file ~max_name_len (tree : Fs.tree) =
-  let pad = String_extra.fill_right max_name_len in
+  let pad = Extra.String.fill_right max_name_len in
   match tree with
   | File (name, _) -> file_char ^ " " ^ pad name
   | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
@@ -112,9 +112,9 @@ let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   let max_len = max_name_len + file_name_padding in
 
   (* Frame *)
-  let top = "╭" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╮" in
-  let mid = "├" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "┤" in
-  let bot = "╰" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╯" in
+  let top = "╭" ^ Extra.String.repeat_txt (max_len - 2) "─" ^ "╮" in
+  let mid = "├" ^ Extra.String.repeat_txt (max_len - 2) "─" ^ "┤" in
+  let bot = "╰" ^ Extra.String.repeat_txt (max_len - 2) "─" ^ "╯" in
 
   (* Line *)
   let fmt_selected_name file = "│ " ^ fmt_file ~max_name_len file ^ " ├" in
@@ -129,7 +129,7 @@ let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   |> List.mapi (fun i file ->
          if i = cursor.pos && has_next then fmt_selected_name file
          else fmt_name file)
-  |> List_extra.in_between ~sep:mid
+  |> Extra.List.in_between ~sep:mid
   |> (fun lines -> [ top ] @ lines @ [ bot ])
   |> List.mapi (fun i s ->
          if i = hi_pos - 1 || i = hi_pos || i = hi_pos + 1 then fmt style s
@@ -142,9 +142,9 @@ let children_to_doc ~prev_total ~pos children =
   let max_len = max_name_len + file_name_padding in
 
   (* Frame *)
-  let top = "  ╭" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╮" in
-  let mid = "│ ├" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "┤" in
-  let bot = "  ╰" ^ String_extra.repeat_txt (max_len - 2) "─" ^ "╯" in
+  let top = "  ╭" ^ Extra.String.repeat_txt (max_len - 2) "─" ^ "╮" in
+  let mid = "│ ├" ^ Extra.String.repeat_txt (max_len - 2) "─" ^ "┤" in
+  let bot = "  ╰" ^ Extra.String.repeat_txt (max_len - 2) "─" ^ "╯" in
 
   (* Connector arrow *)
   let prev_rows_count = (2 * prev_total) + 1 in
@@ -174,7 +174,7 @@ let children_to_doc ~prev_total ~pos children =
     children
     |> Array.to_list
     |> List.mapi fmt_name
-    |> List_extra.in_between ~sep:mid
+    |> Extra.List.in_between ~sep:mid
     |> (fun lines -> [ top ] @ lines @ [ bot ])
     |> (fun lines ->
          let pad_before = List.init (max (connect_pos - 1) 0) (fun _ -> "") in

@@ -1,7 +1,7 @@
 (library
- (name github_tui)
+ (name pretty)
  (libraries
-  cmdliner
-  ezcurl
+  ANSITerminal
+  shell
   ;; Internal dependencies
-  tui))
+  extra))

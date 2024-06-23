@@ -10,7 +10,7 @@ let fmt_chunk { styles; string } = ANSITerminal.sprintf styles "%s" string
 let replicate_chunk width s =
   if width <= 0 then { styles = []; string = "" }
   else
-    let filling = String_extra.repeat_txt width s in
+    let filling = Extra.String.repeat_txt width s in
     { styles = []; string = filling }
 
 type t = {
@@ -23,14 +23,14 @@ let length line = line.length
 let of_chunks chunks =
   let length =
     List.fold_left
-      (fun acc { string; _ } -> acc + String_extra.width string)
+      (fun acc { string; _ } -> acc + Extra.String.width string)
       0 chunks
   in
   { chunks; length }
 
 let prepend_chunk chunk line =
   let chunks = chunk :: line.chunks in
-  let length = String_extra.width chunk.string + line.length in
+  let length = Extra.String.width chunk.string + line.length in
   { chunks; length }
 
 let append line1 line2 =

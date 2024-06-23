@@ -1,7 +1,5 @@
 (library
- (name github_tui)
+ (name fs)
  (libraries
-  cmdliner
-  ezcurl
   ;; Internal dependencies
-  tui))
+  pretty))
