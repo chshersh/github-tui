@@ -1,3 +1,8 @@
+let proc cmd =
+  Printf.eprintf "🐚  %s\n%!" cmd;
+  let _exit_code = Unix.system cmd in
+  ()
+
 let collect_chan (channel : in_channel) : string =
   let rec loop acc =
     match input_line channel with
