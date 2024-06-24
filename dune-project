@@ -25,7 +25,6 @@
    (minttea (>= "0.0.2"))
    shape-the-term
    (terminal_size (>= "0.2.0"))
-   unix
  )
  (tags
   (tui cli git github)))

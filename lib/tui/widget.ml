@@ -22,23 +22,23 @@ let tab_doc ~is_selected tab_lines =
 
 let code_tab ~is_selected =
   tab_doc ~is_selected
-    [ "╭──────╮";
-      "│ Code │";
-      "└──────┴";
+    [ "╭───────╮";
+      "│ Code¹ │";
+      "└───────┴";
     ] [@@ocamlformat "disable"]
 
 let issues_tab ~is_selected =
   tab_doc ~is_selected
-    [ "╭────────╮";
-      "│ Issues │";
-      "┴────────┴";
+    [ "╭─────────╮";
+      "│ Issues² │";
+      "┴─────────┴";
     ] [@@ocamlformat "disable"]
 
 let pull_requests_tab ~is_selected =
   tab_doc ~is_selected
-    [ "╭───────────────╮";
-      "│ Pull Requests │";
-      "┴───────────────┴";
+    [ "╭────────────────╮";
+      "│ Pull Requests³ │";
+      "┴────────────────┴";
     ] [@@ocamlformat "disable"]
 
 let scroll ~lines ~span ~offset =
