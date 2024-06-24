@@ -28,7 +28,8 @@ let update event (model : Model.t) =
   match event with
   (* if we press `q` or the escape key, we exit *)
   | Event.KeyDown ((Key "q" | Escape), _modifier) ->
-      (model, Command.(Seq [ Exit_alt_screen; Show_cursor; Quit ]))
+      ( { model with exit = true },
+        Command.(Seq [ Exit_alt_screen; Show_cursor; Quit ]) )
   (* if we press a digit, we switch to the corresponding tab *)
   | Event.KeyDown (Key "1", _modifier) ->
       ({ model with current_tab = Model.Code }, Command.Noop)
