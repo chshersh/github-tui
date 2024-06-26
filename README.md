@@ -2,11 +2,15 @@
 
 A TUI interface to GitHub.
 
+<p align="center">
+  <img src="./images/demo.gif" />
+</p>
+
 > [!WARNING]
-> `github-tui` is in _alpha_ stage of development!
-> Expect missing features and horrible bugs.
+> `github-tui` is in _pre-alpha_ stage of development!
+> Expect missing features, surprising behaviour and horrible bugs.
 >
-> **Completion**: Done 25%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
+> **Completion**: Done 26%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
 
 > [!IMPORTANT]
 > **DISCLAIMER:** `github-ui` is developed and maintained in free time
