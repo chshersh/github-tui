@@ -13,7 +13,7 @@ A TUI interface to GitHub.
 > **Completion**: Done 26%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
 
 > [!IMPORTANT]
-> **DISCLAIMER:** `github-ui` is developed and maintained in free time
+> **DISCLAIMER:** `github-tui` is developed and maintained in free time
 > voluntarily.  The development may continue for decades or may stop tomorrow. You
 > can use
 > [GitHub Sponsorship](https://github.com/sponsors/chshersh) to support
