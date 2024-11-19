@@ -7,6 +7,12 @@ type tree =
   | File of string * file_contents lazy_t
   | Dir of string * tree array
 
+(* Regex to used to determine if bat outputs a binary file warning*)
+let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
+let binary_file_warning = "This file is binary and cannot be displayed"
+
+(* Extracts the file name from a tree node *)
+
 let file_name = function
   | File (name, _) -> name
   | Dir (name, _) -> name
@@ -32,16 +38,20 @@ let rec sort_tree = function
 let read_file_contents path =
   let cmd =
     "bat --style=numbers,changes --color=always --italic-text=always \
-     --paging=never --terminal-width=80 " ^ path
+    --paging=never --terminal-width=80 " ^ path
   in
   let contents = Shell.proc_stdout cmd in
-  let lines =
-    contents
-    |> String.split_on_char '\n'
-    |> List.map Pretty.str
-    |> Array.of_list
-  in
-  let offset = 0 in
+  let has_binary_warning = Str.string_match binary_file_pattern contents 0 in
+  match has_binary_warning with
+  | true -> { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
+  | _ ->
+    let lines =
+      contents
+      |> String.split_on_char '\n'
+      |> List.map Pretty.str
+      |> Array.of_list
+    in
+    let offset = 0 in
   { lines; offset }
 
 let rec to_tree path =
