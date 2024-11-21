@@ -38,21 +38,21 @@ let rec sort_tree = function
 let read_file_contents path =
   let cmd =
     "bat --style=numbers,changes --color=always --italic-text=always \
-    --paging=never --terminal-width=80 " ^ path
+     --paging=never --terminal-width=80 " ^ path
   in
   let contents = Shell.proc_stdout cmd in
   let has_binary_warning = Str.string_match binary_file_pattern contents 0 in
   match has_binary_warning with
   | true -> { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
   | _ ->
-    let lines =
-      contents
-      |> String.split_on_char '\n'
-      |> List.map Pretty.str
-      |> Array.of_list
-    in
-    let offset = 0 in
-  { lines; offset }
+      let lines =
+        contents
+        |> String.split_on_char '\n'
+        |> List.map Pretty.str
+        |> Array.of_list
+      in
+      let offset = 0 in
+      { lines; offset }
 
 let rec to_tree path =
   if Sys.is_directory path then
