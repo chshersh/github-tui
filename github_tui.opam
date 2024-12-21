@@ -36,5 +36,6 @@ build: [
 dev-repo: "git+https://github.com/chshersh/github-tui.git"
 pin-depends: [
   ["minttea.dev" "git+https://github.com/chshersh/minttea"]
+  ["riot.dev" "git+https://github.com/riot-ml/riot"]
   ["shape-the-term.dev" "git+https://github.com/jmcavanillas/shape-the-term"]
 ]
