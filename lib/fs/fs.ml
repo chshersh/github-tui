@@ -7,9 +7,15 @@ type tree =
   | File of string * file_contents lazy_t
   | Dir of string * tree array
 
-(* Regex to used to determine if bat outputs a binary file warning*)
+(* Regex to used to determine if bat outputs a binary file warning. This is a
+   bit of a fragile approach, but there is no robust way to determine if a file
+   is binary or not. Improve this if it becomes a problem.
+*)
 let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
 let binary_file_warning = "This file is binary and cannot be displayed"
+
+let has_binary_warning contents =
+  Str.string_match binary_file_pattern contents 0
 
 (* Extracts the file name from a tree node *)
 
@@ -41,18 +47,16 @@ let read_file_contents path =
      --paging=never --terminal-width=80 " ^ path
   in
   let contents = Shell.proc_stdout cmd in
-  let has_binary_warning = Str.string_match binary_file_pattern contents 0 in
-  match has_binary_warning with
-  | true -> { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
-  | _ ->
-      let lines =
-        contents
-        |> String.split_on_char '\n'
-        |> List.map Pretty.str
-        |> Array.of_list
-      in
-      let offset = 0 in
-      { lines; offset }
+  if has_binary_warning contents then
+    { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
+  else
+    let lines =
+      contents
+      |> String.split_on_char '\n'
+      |> List.map Pretty.str
+      |> Array.of_list
+    in
+    { lines; offset = 0 }
 
 let rec to_tree path =
   if Sys.is_directory path then
