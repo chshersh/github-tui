@@ -27,15 +27,15 @@ let move_next (model : Model.t) =
 let update event (model : Model.t) =
   match event with
   (* if we press `q` or the escape key, we exit *)
-  | Key "q" | Escape -> { model with exit = true }
+  | Key "q" | Escape -> `Quit
   (* if we press a digit, we switch to the corresponding tab *)
-  | Key "1" -> { model with current_tab = Model.Code }
-  | Key "2" -> { model with current_tab = Model.Issues }
-  | Key "3" -> { model with current_tab = Model.PullRequests }
+  | Key "1" -> `Render { model with current_tab = Model.Code }
+  | Key "2" -> `Render { model with current_tab = Model.Issues }
+  | Key "3" -> `Render { model with current_tab = Model.PullRequests }
   (* directions/movements *)
-  | Up | Key "k" -> move_up model
-  | Down | Key "j" -> move_down model
-  | Left | Key "h" -> move_back model
-  | Right | Key "l" -> move_next model
+  | Up | Key "k" -> `Render (move_up model)
+  | Down | Key "j" -> `Render (move_down model)
+  | Left | Key "h" -> `Render (move_back model)
+  | Right | Key "l" -> `Render (move_next model)
   (* otherwise, we do nothing *)
-  | _ -> model
+  | _ -> `No_diff

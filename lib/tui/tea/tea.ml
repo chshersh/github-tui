@@ -3,7 +3,7 @@ module Key = Key
 type 'model t = {
   init : 'model;
   view : 'model -> string;
-  update : Key.t -> 'model -> 'model;
+  update : Key.t -> 'model -> [ `Render of 'model | `No_diff | `Quit ];
 }
 
 let setup () =
@@ -33,12 +33,15 @@ let run ?log_file { init; view; update } =
     let key = Key.read () in
     log ~tag:"key" ~msg:(Key.show_read key);
 
-    let model =
+    let updated =
       match key with
       | `Read key -> update key model
-      | _ -> model
+      | _ -> `No_diff
     in
-    loop model
+    match updated with
+    | `No_diff -> loop model
+    | `Render model -> loop model
+    | `Quit -> ()
   in
 
   let terminal_io = setup () in

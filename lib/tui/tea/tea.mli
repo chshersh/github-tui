@@ -6,7 +6,7 @@ module Key = Key
 type 'model t = {
   init : 'model;
   view : 'model -> string;
-  update : Key.t -> 'model -> 'model;
+  update : Key.t -> 'model -> [ `Render of 'model | `No_diff | `Quit ];
 }
 
 (** Actually run the TUI application provided the setup *)
