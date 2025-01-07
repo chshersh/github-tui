@@ -6,11 +6,26 @@ type 'model t = {
   update : Key.t -> 'model -> 'model;
 }
 
+let setup () =
+  let terminal_io = Tty.Stdin.setup () in
+  Tty.Terminal.enter_alt_screen ();
+  Tty.Escape_seq.hide_cursor_seq ();
+  Tty.Terminal.clear ();
+  terminal_io
+
+let shutdown terminal_io () =
+  Tty.Terminal.exit_alt_screen ();
+  Tty.Escape_seq.show_cursor_seq ();
+  Tty.Stdin.shutdown terminal_io
+
+let output model_str =
+  Tty.Terminal.clear ();
+  print_endline model_str
+
 let run { init; view; update } =
   let rec loop model =
-    let output = view model in
-    print_endline output;
-
+    let model_str = view model in
+    output model_str;
     let key = Key.read () in
     let model =
       match key with
@@ -20,7 +35,7 @@ let run { init; view; update } =
     loop model
   in
 
-  let terminal_io = Tty.Stdin.setup () in
+  let terminal_io = setup () in
   Fun.protect
-    ~finally:(fun () -> Tty.Stdin.shutdown terminal_io)
+    ~finally:(shutdown terminal_io)
     (fun () -> loop init)
