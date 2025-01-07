@@ -1,0 +1,3 @@
+(library
+ (name log)
+ (libraries unix))

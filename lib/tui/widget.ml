@@ -176,8 +176,8 @@ let children_to_doc ~prev_total ~pos children =
     |> Extra.List.in_between ~sep:mid
     |> (fun lines -> [ top ] @ lines @ [ bot ])
     |> (fun lines ->
-         let pad_before = List.init (max (connect_pos - 1) 0) (fun _ -> "") in
-         pad_before @ lines)
+    let pad_before = List.init (max (connect_pos - 1) 0) (fun _ -> "") in
+    pad_before @ lines)
     |> List.map str
     |> vertical
   in

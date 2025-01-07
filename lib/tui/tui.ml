@@ -44,10 +44,10 @@ let init ~repo ~local_path : Model.initial_data =
   let { height; width } = get_terminal_dimensions () in
   { repo; root_dir_path; files; width; height }
 
-let app = Minttea.app ~init:Init.init ~update:Update.update ~view:View.view ()
-
-let start ~repo ~local_path =
+let start ~repo ~local_path ~log_file =
   let initial_data = init ~repo ~local_path in
-  let initial_model = Model.initial_model initial_data in
-  let config = Minttea.make_config ~fps:1 () in
-  Minttea.start ~config app ~initial_model
+  let init = Model.initial_model initial_data in
+  let app : Model.t Tea.t =
+    { init; update = Update.update; view = View.view }
+  in
+  Tea.run ?log_file app

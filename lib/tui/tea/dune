@@ -1,0 +1,3 @@
+(library
+ (name tea)
+ (libraries tty unix uutf log))

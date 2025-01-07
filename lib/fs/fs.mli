@@ -1,4 +1,5 @@
-(** File contents as an array of lines, where each line is wrapped into a document (for rendering efficiency) *)
+(** File contents as an array of lines, where each line is wrapped into a
+    document (for rendering efficiency) *)
 type file_contents = {
   lines : Pretty.doc array;
   offset : int;
@@ -46,7 +47,8 @@ val go_down : zipper -> zipper
 (** Move to the previous file within the same directory. Cycles. *)
 val go_up : zipper -> zipper
 
-(** Move to the directory under the current cursor. Doesn't move inside files or empty directories. *)
+(** Move to the directory under the current cursor. Doesn't move inside files or
+    empty directories. *)
 val go_next : zipper -> zipper
 
 (** Move to the parent directory. *)

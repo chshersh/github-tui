@@ -7,5 +7,6 @@ type t = {
 (** Convert a chunk to string, applying formatting *)
 val fmt : t -> string
 
-(** [replicate_chunk n s] creates a chunk without formatting of [n] repeated strings [s]. *)
+(** [replicate_chunk n s] creates a chunk without formatting of [n] repeated
+    strings [s]. *)
 val replicate : int -> string -> t
