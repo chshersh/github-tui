@@ -1,4 +1,4 @@
-open Minttea
+open Tea.Key
 
 let move_fs move_fn (code_tab : Model.code_tab) =
   let fs = move_fn code_tab.fs in
@@ -27,23 +27,15 @@ let move_next (model : Model.t) =
 let update event (model : Model.t) =
   match event with
   (* if we press `q` or the escape key, we exit *)
-  | Event.KeyDown ((Key "q" | Escape), _modifier) ->
-      ( { model with exit = true },
-        Command.(Seq [ Exit_alt_screen; Show_cursor; Quit ]) )
+  | Key "q" | Escape -> { model with exit = true }
   (* if we press a digit, we switch to the corresponding tab *)
-  | Event.KeyDown (Key "1", _modifier) ->
-      ({ model with current_tab = Model.Code }, Command.Noop)
-  | Event.KeyDown (Key "2", _modifier) ->
-      ({ model with current_tab = Model.Issues }, Command.Noop)
-  | Event.KeyDown (Key "3", _modifier) ->
-      ({ model with current_tab = Model.PullRequests }, Command.Noop)
+  | Key "1" -> { model with current_tab = Model.Code }
+  | Key "2" -> { model with current_tab = Model.Issues }
+  | Key "3" -> { model with current_tab = Model.PullRequests }
   (* directions/movements *)
-  | Event.KeyDown ((Up | Key "k"), _modifier) -> (move_up model, Command.Noop)
-  | Event.KeyDown ((Down | Key "j"), _modifier) ->
-      (move_down model, Command.Noop)
-  | Event.KeyDown ((Left | Key "h"), _modifier) ->
-      (move_back model, Command.Noop)
-  | Event.KeyDown ((Right | Key "l"), _modifier) ->
-      (move_next model, Command.Noop)
+  | Up | Key "k" -> move_up model
+  | Down | Key "j" -> move_down model
+  | Left | Key "h" -> move_back model
+  | Right | Key "l" -> move_next model
   (* otherwise, we do nothing *)
-  | _ -> (model, Command.Noop)
+  | _ -> model

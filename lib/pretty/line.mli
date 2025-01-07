@@ -1,13 +1,13 @@
 (** A type defining a single line of text with different parts ("chunks") having
-potentially different formatting. *)
+    potentially different formatting. *)
 type t
 
 (** Returns the length of a line as in the number of graphemes (before
-formatting applied). *)
+    formatting applied). *)
 val length : t -> int
 
 (** Smart constructor for a line from a list of chunks to calculate the final
-[length] automatically as well. *)
+    [length] automatically as well. *)
 val of_chunks : Chunk.t list -> t
 
 (** Add a chunk to the beginning of a line. *)

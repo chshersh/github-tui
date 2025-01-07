@@ -15,7 +15,7 @@ jobs:
         os:
           - ubuntu-latest
         ocaml-compiler:
-          - 5.1.1
+          - 5.2.1
 
     steps:
       - name: Checkout code
@@ -38,10 +38,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use OCaml 5.1.1
+      - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 5.1.1
+          ocaml-compiler: 5.2.1
           dune-cache: true
 
       - name: Lint doc
@@ -53,10 +53,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use OCaml 5.1.1
+      - name: Setup OCaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 5.1.1
+          ocaml-compiler: 5.2.1
           dune-cache: true
 
       - name: Lint fmt

@@ -1,11 +1,11 @@
 (library
  (name tui)
  (libraries
-  minttea
   terminal_size
   ;; Internal dependencies
   extra
   fs
   pretty
   scroll
-  shell))
+  shell
+  tea))
