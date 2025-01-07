@@ -11,8 +11,15 @@ let path_arg =
     & opt (some string) None
     & info [ "d"; "directory" ] ~docv:"DIRECTORY_PATH" ~doc)
 
-let run repo local_path = Tui.start ~repo ~local_path
-let gh_tui_term = Term.(const run $ repo_arg $ path_arg)
+let log_arg =
+  let doc = "Log debug information to the given file" in
+  Arg.(
+    value
+    & opt (some string) None
+    & info [ "l"; "log-to" ] ~docv:"LOG_PATH" ~doc)
+
+let run repo local_path log_file = Tui.start ~repo ~local_path ~log_file
+let gh_tui_term = Term.(const run $ repo_arg $ path_arg $ log_arg)
 
 let cmd =
   let doc = "TUI of a GitHub repository" in

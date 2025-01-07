@@ -16,8 +16,19 @@ type t =
   | Enter
   | Key of string
 
+(** A function to show [t]. Used for debug purposes. *)
+val show_key : t -> string
+
 (** Parse [t] from the standard sequence of characters. *)
 val parse : string -> t
 
+type read =
+  [ `End
+  | `Malformed of string
+  | `Read of t
+  ]
+
 (** Read a key event from [stdin]. *)
-val read : unit -> [> `Retry | `End | `Malformed of string | `Read of t ]
+val read : unit -> [> read ]
+
+val show_read : read -> string

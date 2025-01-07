@@ -44,10 +44,10 @@ let init ~repo ~local_path : Model.initial_data =
   let { height; width } = get_terminal_dimensions () in
   { repo; root_dir_path; files; width; height }
 
-let start ~repo ~local_path =
+let start ~repo ~local_path ~log_file =
   let initial_data = init ~repo ~local_path in
   let init = Model.initial_model initial_data in
   let app : Model.t Tea.t =
     { init; update = Update.update; view = View.view }
   in
-  Tea.run app
+  Tea.run ?log_file app

@@ -10,4 +10,4 @@ type 'model t = {
 }
 
 (** Actually run the TUI application provided the setup *)
-val run : 'model t -> unit
+val run : ?log_file:string -> 'model t -> unit

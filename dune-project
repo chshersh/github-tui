@@ -26,6 +26,7 @@
    shape-the-term
    (terminal_size (>= "0.2.0"))
    (tty (>= "0.0.2"))
+   (uutf (>= "1.0.3"))
  )
  (tags
   (tui cli git github)))

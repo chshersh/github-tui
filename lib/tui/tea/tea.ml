@@ -22,11 +22,17 @@ let output model_str =
   Tty.Terminal.clear ();
   print_endline model_str
 
-let run { init; view; update } =
+let run ?log_file { init; view; update } =
+  let log = Log.log ~path:log_file in
   let rec loop model =
+    log ~tag:"loop" ~msg:"Loop start";
+
     let model_str = view model in
     output model_str;
+
     let key = Key.read () in
+    log ~tag:"key" ~msg:(Key.show_read key);
+
     let model =
       match key with
       | `Read key -> update key model
@@ -36,6 +42,4 @@ let run { init; view; update } =
   in
 
   let terminal_io = setup () in
-  Fun.protect
-    ~finally:(shutdown terminal_io)
-    (fun () -> loop init)
+  Fun.protect ~finally:(shutdown terminal_io) (fun () -> loop init)

@@ -14,6 +14,17 @@ type t =
   | Enter
   | Key of string
 
+let show_key = function
+  | Up -> "<up>"
+  | Down -> "<down>"
+  | Left -> "<left>"
+  | Right -> "<right>"
+  | Space -> "<space>"
+  | Escape -> "<esc>"
+  | Backspace -> "<backspace>"
+  | Enter -> "<enter>"
+  | Key key -> key
+
 let parse = function
   | " " -> Space
   | "\027" -> Escape
@@ -25,12 +36,23 @@ let parse = function
   | "\n" -> Enter
   | key -> Key key
 
+type read =
+  [ `End
+  | `Malformed of string
+  | `Read of t
+  ]
+
+let show_read = function
+  | `End -> "End"
+  | `Malformed s -> Printf.sprintf "Malformed: %s" s
+  | `Read key -> Printf.sprintf "Key: %s" (show_key key)
+
 let read_key key =
   match key with
   | "\027" -> (
-      match Tty.Stdin.read_utf8 () with
+      match Stdin.read_utf8 () with
       | `Read "[" -> (
-          match Tty.Stdin.read_utf8 () with
+          match Stdin.read_utf8 () with
           | `Read key -> parse ("\027[" ^ key)
           | _ -> parse key)
       | _ -> parse key)
@@ -38,6 +60,6 @@ let read_key key =
   | key -> parse key
 
 let read () =
-  match Tty.Stdin.read_utf8 () with
+  match Stdin.read_utf8 () with
   | `Read key -> `Read (read_key key)
-  | (`Retry | `End | `Malformed _) as other -> other
+  | (`End | `Malformed _) as other -> other
