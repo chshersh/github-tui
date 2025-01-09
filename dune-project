@@ -22,7 +22,6 @@
    (ANSITerminal (>= "0.8.5"))
    (cmdliner (>= "1.2.0"))
    (ezcurl (>= "0.2.4"))
-   (minttea (>= "0.0.2"))
    shape-the-term
    (terminal_size (>= "0.2.0"))
    (tty (>= "0.0.2"))
