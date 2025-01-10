@@ -21,8 +21,8 @@ let shutdown terminal_io () =
   Tty.Stdin.shutdown terminal_io
 
 let output_str str =
-  let len = String.length str in
   let bytes = String.to_bytes str in
+  let len = Bytes.length bytes in
   let _ = Unix.write Unix.stdout bytes 0 len in
   ()
 
