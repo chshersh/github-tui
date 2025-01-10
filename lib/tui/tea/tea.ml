@@ -4,12 +4,9 @@ type 'model t = {
   init : 'model;
   view : 'model -> string;
   update : Key.t -> 'model -> [ `Render of 'model | `Quit ];
-  mutable buffer : Buffer.t;
 }
 
-let make ~init ~view ~update =
-  let buffer = Buffer.create 0 in
-  { init; view; update; buffer }
+let make ~init ~view ~update = { init; view; update }
 
 let setup () =
   let terminal_io = Tty.Stdin.setup () in
@@ -23,28 +20,55 @@ let shutdown terminal_io () =
   Tty.Escape_seq.show_cursor_seq ();
   Tty.Stdin.shutdown terminal_io
 
-let output ~buffer:_ model_str =
-  let len = String.length model_str in
-  let new_buffer = Buffer.create len in
-  Buffer.add_string new_buffer model_str;
+let output_str str =
+  let len = String.length str in
+  let bytes = String.to_bytes str in
+  let _ = Unix.write Unix.stdout bytes 0 len in
+  ()
 
-  Tty.Terminal.clear ();
-  let _ = Unix.write Unix.stdout (Buffer.to_bytes new_buffer) 0 len in
+let output_line str = output_str (str ^ "\n")
 
-  new_buffer
+let clear_of width =
+  let spaces = String.make width ' ' in
+  output_line spaces
 
-let run ?log_file tea =
-  let log = Log.log ~path:log_file in
+let output_diff ~old_line ~new_line =
+  output_str new_line;
 
-  let rec loop model =
-    log ~tag:"loop" ~msg:"Loop start";
+  let old_width = Extra.String.width old_line in
+  let new_width = Extra.String.width new_line in
 
+  if old_width <= new_width then output_line ""
+  else
+    let clear_width = old_width - new_width in
+    clear_of clear_width
+
+let rec output_lines ~old_lines ~new_lines =
+  match (old_lines, new_lines) with
+  | [], [] -> flush stdout
+  | [], new_line :: new_lines ->
+      output_line new_line;
+      output_lines ~old_lines ~new_lines
+  | old_line :: old_lines, [] ->
+      clear_of (Extra.String.width old_line);
+      output_lines ~old_lines ~new_lines
+  | old_line :: old_lines, new_line :: new_lines ->
+      output_diff ~old_line ~new_line;
+      output_lines ~old_lines ~new_lines
+
+let output ~old_lines model_str =
+  let new_lines = String.split_on_char '\n' model_str in
+
+  Tty.Terminal.move_cursor 0 0;
+  output_lines ~old_lines ~new_lines;
+  new_lines
+
+let run ?path:_ tea =
+  let rec loop old_lines model =
     let model_str = tea.view model in
-    let new_buffer = output ~buffer:tea.buffer model_str in
-    tea.buffer <- new_buffer;
+    let new_lines = output ~old_lines model_str in
 
     let key = Key.read () in
-    log ~tag:"key" ~msg:(Key.show_read key);
 
     let updated =
       match key with
@@ -52,9 +76,9 @@ let run ?log_file tea =
       | _ -> `Render model
     in
     match updated with
-    | `Render model -> loop model
+    | `Render model -> loop new_lines model
     | `Quit -> ()
   in
 
   let terminal_io = setup () in
-  Fun.protect ~finally:(shutdown terminal_io) (fun () -> loop tea.init)
+  Fun.protect ~finally:(shutdown terminal_io) (fun () -> loop [] tea.init)

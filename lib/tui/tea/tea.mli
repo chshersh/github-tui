@@ -15,4 +15,4 @@ val make :
   'model t
 
 (** Actually run the TUI application provided the setup *)
-val run : ?log_file:string -> 'model t -> unit
+val run : ?path:string -> 'model t -> unit

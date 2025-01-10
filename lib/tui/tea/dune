@@ -1,3 +1,9 @@
 (library
  (name tea)
- (libraries tty unix uutf log))
+ (libraries
+  tty
+  unix
+  uutf
+  ;; Internal dependencies
+  extra
+  log))
