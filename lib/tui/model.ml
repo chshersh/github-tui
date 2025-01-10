@@ -11,7 +11,6 @@ type tab =
   | PullRequests
 
 type t = {
-  exit : bool;
   width : int;
   height : int;
   repo : string;
@@ -32,7 +31,6 @@ let initial_model { repo; root_dir_path; files; width; height } =
     width;
     height;
     repo;
-    exit = false;
     current_tab = Code;
     code_tab = { root_dir_path; fs = Fs.zip_it files };
   }
