@@ -11,7 +11,7 @@ type 'model t
 val make :
   init:'model ->
   view:('model -> string) ->
-  update:(Key.t -> 'model -> [ `Render of 'model | `No_diff | `Quit ]) ->
+  update:(Key.t -> 'model -> [ `Render of 'model | `Quit ]) ->
   'model t
 
 (** Actually run the TUI application provided the setup *)

@@ -38,4 +38,4 @@ let update event (model : Model.t) =
   | Left | Key "h" -> `Render (move_back model)
   | Right | Key "l" -> `Render (move_next model)
   (* otherwise, we do nothing *)
-  | _ -> `No_diff
+  | _ -> `Render model
