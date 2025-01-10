@@ -6,6 +6,8 @@ type 'model t = {
   update : Key.t -> 'model -> [ `Render of 'model | `No_diff | `Quit ];
 }
 
+let make ~init ~view ~update = { init; view; update }
+
 let setup () =
   let terminal_io = Tty.Stdin.setup () in
   Tty.Terminal.enter_alt_screen ();

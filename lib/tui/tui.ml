@@ -47,7 +47,5 @@ let init ~repo ~local_path : Model.initial_data =
 let start ~repo ~local_path ~log_file =
   let initial_data = init ~repo ~local_path in
   let init = Model.initial_model initial_data in
-  let app : Model.t Tea.t =
-    { init; update = Update.update; view = View.view }
-  in
+  let app = Tea.make ~init ~update:Update.update ~view:View.view in
   Tea.run ?log_file app
