@@ -1,14 +1,12 @@
-type file_contents = {
-  lines : Pretty.doc array;
-  offset : int;
-}
-
-type file_type =
-  | Text
-  | Binary
+type file_contents =
+  | Binary of { offset : int }
+  | Text of {
+      lines : Pretty.doc array;
+      offset : int;
+    }
 
 type tree =
-  | File of string * file_contents Lazy.t * file_type Lazy.t
+  | File of string * file_contents Lazy.t
   | Dir of string * tree array
 
 (* Regex to used to determine if bat outputs a binary file warning. This is a
@@ -27,7 +25,7 @@ let has_binary_warning contents =
 (* Extracts the file name from a tree node *)
 
 let file_name = function
-  | File (name, _, _) -> name
+  | File (name, _) -> name
   | Dir (name, _) -> name
 
 (* A files comparison:
@@ -42,7 +40,7 @@ let order_files t1 t2 =
   | _, _ -> String.compare (file_name t1) (file_name t2)
 
 let rec sort_tree = function
-  | File (name, contents, ft) -> File (name, contents, ft)
+  | File (name, contents) -> File (name, contents)
   | Dir (name, children) ->
       Array.sort order_files children;
       Dir (name, Array.map sort_tree children)
@@ -52,8 +50,7 @@ let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read_file_contents path =
   let contents = read_file_raw path in
-  if has_binary_warning contents then
-    { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
+  if has_binary_warning contents then Binary { offset = 0 }
   else
     let lines =
       contents
@@ -61,12 +58,7 @@ let read_file_contents path =
       |> List.map Pretty.str
       |> Array.of_list
     in
-    { lines; offset = 0 }
-
-(* Reads file type using bat to determine icon to show *)
-let read_file_type path =
-  let contents = read_file_raw path in
-  if has_binary_warning contents then Binary else Text
+    Text { lines; offset = 0 }
 
 (* Recursively reads a directory tree *)
 let rec to_tree path =
@@ -78,11 +70,7 @@ let rec to_tree path =
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
-  else
-    File
-      ( Filename.basename path,
-        lazy (read_file_contents path),
-        lazy (read_file_type path) )
+  else File (Filename.basename path, lazy (read_file_contents path))
 
 let read_tree path = path |> to_tree |> sort_tree
 
@@ -111,6 +99,23 @@ let zipper_parents zipper =
 (* TODO: Horrible hardcoding of maximum lines view *)
 let span = 40
 
+let update_cursor cursor offset =
+  match cursor with
+  | Text cur -> File_cursor (Text { cur with offset })
+  | Binary _ -> File_cursor (Binary { offset })
+
+let offset_from_file_contents = function
+  | Text { offset; _ } -> offset
+  | Binary { offset } -> offset
+
+let line_len_from_file_contents = function
+  | Text { lines; _ } -> Array.length lines
+  | Binary _ -> 1
+
+let lines_from_file_contents = function
+  | Text { lines; _ } -> lines
+  | Binary _ -> [| Pretty.str binary_file_warning |]
+
 let go_down zipper =
   match zipper.current with
   | Dir_cursor cursor ->
@@ -119,11 +124,10 @@ let go_down zipper =
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
   | File_cursor cursor ->
-      let new_offset = cursor.offset + 1 in
-      let new_cursor = File_cursor { cursor with offset = new_offset } in
-      let len = Array.length cursor.lines in
+      let len = line_len_from_file_contents cursor in
+      let new_offset = offset_from_file_contents cursor + 1 in
       if new_offset + span > len then zipper
-      else { zipper with current = new_cursor }
+      else { zipper with current = update_cursor cursor new_offset }
 
 let go_up zipper =
   match zipper.current with
@@ -133,9 +137,8 @@ let go_up zipper =
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
   | File_cursor cursor ->
-      let new_offset = max 0 (cursor.offset - 1) in
-      let new_cursor = File_cursor { cursor with offset = new_offset } in
-      { zipper with current = new_cursor }
+      let new_offset = max 0 (offset_from_file_contents cursor - 1) in
+      { zipper with current = update_cursor cursor new_offset }
 
 let go_next zipper =
   match zipper.current with
@@ -143,7 +146,7 @@ let go_next zipper =
   | Dir_cursor cursor -> (
       let next = file_at cursor in
       match next with
-      | File (_name, contents, _) ->
+      | File (_name, contents) ->
           {
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);

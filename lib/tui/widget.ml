@@ -71,15 +71,14 @@ let pwd root_dir_path (fs : Fs.zipper) =
   Pretty.(fmt Style.directory full_path)
 
 let file_contents_to_doc ~(file_contents : Fs.file_contents) =
-  let lines = Array.length file_contents.lines in
+  let lines = Fs.lines_from_file_contents file_contents in
+  let len_lines = Array.length lines in
   let span = 40 in
-  let offset = file_contents.offset in
+  let offset = Fs.offset_from_file_contents file_contents in
 
-  let contents_span =
-    Extra.List.of_sub_array ~offset ~len:span file_contents.lines
-  in
+  let contents_span = Extra.List.of_sub_array ~offset ~len:span lines in
 
-  let scroll_doc = scroll ~lines ~span ~offset in
+  let scroll_doc = scroll ~lines:len_lines ~span ~offset in
   let contents_doc = Pretty.vertical contents_span in
   Pretty.(horizontal [ scroll_doc; str " "; contents_doc ])
 
@@ -102,8 +101,10 @@ let max_file_name_len files =
 let fmt_file ~max_name_len (tree : Fs.tree) =
   let pad = Extra.String.fill_right max_name_len in
   match tree with
-  | File (name, _, ft) when Lazy.force ft = Binary -> bin_char ^ " " ^ pad name
-  | File (name, _, _) -> file_char ^ " " ^ pad name
+  | File (name, contents) -> (
+      match Lazy.force contents with
+      | Fs.Text _ -> file_char ^ " " ^ pad name
+      | Fs.Binary _ -> bin_char ^ " " ^ pad name)
   | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
   | Dir (name, _) -> dir_char ^ " " ^ pad name
 
@@ -235,7 +236,7 @@ let fs_to_view (fs : Fs.zipper) =
     | File_cursor contents, parent :: _ -> (parent, File_selected contents)
     | Dir_cursor cursor, _ -> (
         match Fs.file_at cursor with
-        | File (_, contents, _) -> (cursor, File_selected (Lazy.force contents))
+        | File (_, contents) -> (cursor, File_selected (Lazy.force contents))
         | Dir (_, children) ->
             ( cursor,
               Dir_selected
