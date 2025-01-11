@@ -5,7 +5,8 @@ let clone_repo ~repo ~local_path =
       let owner, repo =
         match String.split_on_char '/' repo with
         | [ owner; repo ] -> (owner, repo)
-        | _ -> ("chshersh", "zbg")
+        | _ -> ("chshersh", "github-tui")
+        (* TODO: lol *)
       in
       let temp_dir =
         Filename.temp_dir "github-tui-" (Printf.sprintf "%s-%s" owner repo)

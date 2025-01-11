@@ -2,6 +2,5 @@
  (name github_tui)
  (libraries
   cmdliner
-  ezcurl
   ;; Internal dependencies
   tui))
