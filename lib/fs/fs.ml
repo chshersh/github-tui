@@ -3,8 +3,12 @@ type file_contents = {
   offset : int;
 }
 
+type file_type =
+  | Text
+  | Binary
+
 type tree =
-  | File of string * file_contents lazy_t
+  | File of string * file_contents Lazy.t * file_type Lazy.t
   | Dir of string * tree array
 
 (* Regex to used to determine if bat outputs a binary file warning. This is a
@@ -14,13 +18,17 @@ type tree =
 let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
 let binary_file_warning = "This file is binary and cannot be displayed"
 
+let bat_cmd =
+  "bat --style=numbers,changes --color=always --italic-text=always \
+   --paging=never --terminal-width=80 "
+
 let has_binary_warning contents =
   Str.string_match binary_file_pattern contents 0
 
 (* Extracts the file name from a tree node *)
 
 let file_name = function
-  | File (name, _) -> name
+  | File (name, _, _) -> name
   | Dir (name, _) -> name
 
 (* A files comparison:
@@ -35,18 +43,16 @@ let order_files t1 t2 =
   | _, _ -> String.compare (file_name t1) (file_name t2)
 
 let rec sort_tree = function
-  | File (name, contents) -> File (name, contents)
+  | File (name, contents, ft) -> File (name, contents, ft)
   | Dir (name, children) ->
       Array.sort order_files children;
       Dir (name, Array.map sort_tree children)
 
+let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
+
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read_file_contents path =
-  let cmd =
-    "bat --style=numbers,changes --color=always --italic-text=always \
-     --paging=never --terminal-width=80 " ^ path
-  in
-  let contents = Shell.proc_stdout cmd in
+  let contents = read_file_raw path in
   if has_binary_warning contents then
     { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
   else
@@ -58,6 +64,12 @@ let read_file_contents path =
     in
     { lines; offset = 0 }
 
+(* Reads file type using bat to determine icon to show *)
+let read_file_type path =
+  let contents = read_file_raw path in
+  if has_binary_warning contents then Binary else Text
+
+(* Recursively reads a directory tree *)
 let rec to_tree path =
   if Sys.is_directory path then
     let children =
@@ -67,7 +79,11 @@ let rec to_tree path =
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
-  else File (Filename.basename path, lazy (read_file_contents path))
+  else
+    File
+      ( Filename.basename path,
+        lazy (read_file_contents path),
+        lazy (read_file_type path) )
 
 let read_tree path = path |> to_tree |> sort_tree
 
@@ -128,7 +144,7 @@ let go_next zipper =
   | Dir_cursor cursor -> (
       let next = file_at cursor in
       match next with
-      | File (_name, contents) ->
+      | File (_name, contents, _) ->
           {
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);

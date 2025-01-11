@@ -5,9 +5,14 @@ type file_contents = {
   offset : int;
 }
 
+(** If bat reports the file as being binary or not *)
+type file_type =
+  | Text
+  | Binary
+
 (** A definition of a file tree. *)
 type tree =
-  | File of string * file_contents lazy_t
+  | File of string * file_contents Lazy.t * file_type Lazy.t
   | Dir of string * tree array
 
 (** Return the name of a given tree node. *)

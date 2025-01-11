@@ -58,6 +58,7 @@ let pwd_char = "\u{e5fd}"
 let dir_char = "\u{f4d4}"
 let empty_dir_char = "\u{f413}"
 let file_char = "\u{f4a5}"
+let bin_char = "\u{eae8}"
 
 let parents_path parents =
   List.fold_left (fun acc cur -> Filename.concat acc cur) "" (List.rev parents)
@@ -101,7 +102,8 @@ let max_file_name_len files =
 let fmt_file ~max_name_len (tree : Fs.tree) =
   let pad = Extra.String.fill_right max_name_len in
   match tree with
-  | File (name, _) -> file_char ^ " " ^ pad name
+  | File (name, _, ft) when Lazy.force ft = Binary -> bin_char ^ " " ^ pad name
+  | File (name, _, _) -> file_char ^ " " ^ pad name
   | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
   | Dir (name, _) -> dir_char ^ " " ^ pad name
 
@@ -233,7 +235,7 @@ let fs_to_view (fs : Fs.zipper) =
     | File_cursor contents, parent :: _ -> (parent, File_selected contents)
     | Dir_cursor cursor, _ -> (
         match Fs.file_at cursor with
-        | File (_, contents) -> (cursor, File_selected (Lazy.force contents))
+        | File (_, contents, _) -> (cursor, File_selected (Lazy.force contents))
         | Dir (_, children) ->
             ( cursor,
               Dir_selected
