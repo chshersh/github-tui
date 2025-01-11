@@ -19,8 +19,7 @@ let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
 let binary_file_warning = "This file is binary and cannot be displayed"
 
 let bat_cmd =
-  "bat --style=numbers,changes --color=always --italic-text=always \
-   --paging=never --terminal-width=80 "
+  {|bat --style=numbers,changes --color=always --italic-text=always --paging=never --terminal-width=80 |}
 
 let has_binary_warning contents =
   Str.string_match binary_file_pattern contents 0
