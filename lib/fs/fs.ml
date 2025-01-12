@@ -1,5 +1,5 @@
 type file_contents =
-  | Binary of { offset : int }
+  | Binary
   | Text of {
       lines : Pretty.doc array;
       offset : int;
@@ -50,7 +50,7 @@ let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read_file_contents path =
   let contents = read_file_raw path in
-  if has_binary_warning contents then Binary { offset = 0 }
+  if has_binary_warning contents then Binary
   else
     let lines =
       contents
@@ -102,19 +102,19 @@ let span = 40
 let update_cursor cursor offset =
   match cursor with
   | Text cur -> File_cursor (Text { cur with offset })
-  | Binary _ -> File_cursor (Binary { offset })
+  | Binary -> File_cursor Binary
 
 let offset_from_file_contents = function
   | Text { offset; _ } -> offset
-  | Binary { offset } -> offset
+  | Binary -> 0
 
 let line_len_from_file_contents = function
   | Text { lines; _ } -> Array.length lines
-  | Binary _ -> 1
+  | Binary -> 1
 
 let lines_from_file_contents = function
   | Text { lines; _ } -> lines
-  | Binary _ -> [| Pretty.str binary_file_warning |]
+  | Binary -> [| Pretty.str binary_file_warning |]
 
 let go_down zipper =
   match zipper.current with

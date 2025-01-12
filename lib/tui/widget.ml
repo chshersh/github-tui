@@ -104,7 +104,7 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
   | File (name, contents) -> (
       match Lazy.force contents with
       | Fs.Text _ -> file_char ^ " " ^ pad name
-      | Fs.Binary _ -> bin_char ^ " " ^ pad name)
+      | Fs.Binary -> bin_char ^ " " ^ pad name)
   | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
   | Dir (name, _) -> dir_char ^ " " ^ pad name
 

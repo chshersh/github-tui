@@ -1,7 +1,7 @@
 (** File contents as an array of lines, where each line is wrapped into a
     document (for rendering efficiency) *)
 type file_contents =
-  | Binary of { offset : int }
+  | Binary
   | Text of {
       lines : Pretty.doc array;
       offset : int;
