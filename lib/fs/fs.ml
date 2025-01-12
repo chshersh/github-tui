@@ -1,10 +1,12 @@
-type file_contents = {
-  lines : Pretty.doc array;
-  offset : int;
-}
+type file_contents =
+  | Binary
+  | Text of {
+      lines : Pretty.doc array;
+      offset : int;
+    }
 
 type tree =
-  | File of string * file_contents lazy_t
+  | File of string * file_contents Lazy.t
   | Dir of string * tree array
 
 (* Regex to used to determine if bat outputs a binary file warning. This is a
@@ -13,6 +15,9 @@ type tree =
 *)
 let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
 let binary_file_warning = "This file is binary and cannot be displayed"
+
+let bat_cmd =
+  {|bat --style=numbers,changes --color=always --italic-text=always --paging=never --terminal-width=80 |}
 
 let has_binary_warning contents =
   Str.string_match binary_file_pattern contents 0
@@ -40,15 +45,12 @@ let rec sort_tree = function
       Array.sort order_files children;
       Dir (name, Array.map sort_tree children)
 
+let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
+
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read_file_contents path =
-  let cmd =
-    "bat --style=numbers,changes --color=always --italic-text=always \
-     --paging=never --terminal-width=80 " ^ path
-  in
-  let contents = Shell.proc_stdout cmd in
-  if has_binary_warning contents then
-    { lines = [| Pretty.str binary_file_warning |]; offset = 0 }
+  let contents = read_file_raw path in
+  if has_binary_warning contents then Binary
   else
     let lines =
       contents
@@ -56,8 +58,9 @@ let read_file_contents path =
       |> List.map Pretty.str
       |> Array.of_list
     in
-    { lines; offset = 0 }
+    Text { lines; offset = 0 }
 
+(* Recursively reads a directory tree *)
 let rec to_tree path =
   if Sys.is_directory path then
     let children =
@@ -96,6 +99,23 @@ let zipper_parents zipper =
 (* TODO: Horrible hardcoding of maximum lines view *)
 let span = 40
 
+let update_cursor cursor offset =
+  match cursor with
+  | Text cur -> File_cursor (Text { cur with offset })
+  | Binary -> File_cursor Binary
+
+let offset_from_file_contents = function
+  | Text { offset; _ } -> offset
+  | Binary -> 0
+
+let line_len_from_file_contents = function
+  | Text { lines; _ } -> Array.length lines
+  | Binary -> 1
+
+let lines_from_file_contents = function
+  | Text { lines; _ } -> lines
+  | Binary -> [| Pretty.str binary_file_warning |]
+
 let go_down zipper =
   match zipper.current with
   | Dir_cursor cursor ->
@@ -104,11 +124,10 @@ let go_down zipper =
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
   | File_cursor cursor ->
-      let new_offset = cursor.offset + 1 in
-      let new_cursor = File_cursor { cursor with offset = new_offset } in
-      let len = Array.length cursor.lines in
+      let len = line_len_from_file_contents cursor in
+      let new_offset = offset_from_file_contents cursor + 1 in
       if new_offset + span > len then zipper
-      else { zipper with current = new_cursor }
+      else { zipper with current = update_cursor cursor new_offset }
 
 let go_up zipper =
   match zipper.current with
@@ -118,9 +137,8 @@ let go_up zipper =
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
   | File_cursor cursor ->
-      let new_offset = max 0 (cursor.offset - 1) in
-      let new_cursor = File_cursor { cursor with offset = new_offset } in
-      { zipper with current = new_cursor }
+      let new_offset = max 0 (offset_from_file_contents cursor - 1) in
+      { zipper with current = update_cursor cursor new_offset }
 
 let go_next zipper =
   match zipper.current with

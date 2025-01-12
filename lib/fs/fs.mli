@@ -1,13 +1,15 @@
 (** File contents as an array of lines, where each line is wrapped into a
     document (for rendering efficiency) *)
-type file_contents = {
-  lines : Pretty.doc array;
-  offset : int;
-}
+type file_contents =
+  | Binary
+  | Text of {
+      lines : Pretty.doc array;
+      offset : int;
+    }
 
 (** A definition of a file tree. *)
 type tree =
-  | File of string * file_contents lazy_t
+  | File of string * file_contents Lazy.t
   | Dir of string * tree array
 
 (** Return the name of a given tree node. *)
@@ -53,3 +55,12 @@ val go_next : zipper -> zipper
 
 (** Move to the parent directory. *)
 val go_back : zipper -> zipper
+
+(** Return line length for arbitrary file *)
+val line_len_from_file_contents : file_contents -> int
+
+(** Return lines for arbitrary file *)
+val lines_from_file_contents : file_contents -> Pretty.doc array
+
+(** Return offset for arbitrary file *)
+val offset_from_file_contents : file_contents -> int
