@@ -8,9 +8,9 @@ A TUI interface to GitHub.
 
 > [!WARNING]
 > `github-tui` is in _pre-alpha_ stage of development!
-> Expect missing features, surprising behaviour and horrible bugs.
+> Expect missing features, surprising behaviour, horrible bugs and breaking changes.
 >
-> **Completion**: Done 26%/100% 🌕🌕🌗🌑🌑🌑🌑🌑🌑🌑
+> **Completion**: Done 32%/100% 🌕🌕🌕🌘🌑🌑🌑🌑🌑🌑
 
 > [!IMPORTANT]
 > **DISCLAIMER:** `github-tui` is developed and maintained in free time
