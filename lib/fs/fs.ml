@@ -13,11 +13,6 @@ type cursor =
   | Dir_cursor of dir_cursor
   | File_cursor of Filec.t
 
-let update_cursor cursor offset =
-  match cursor with
-  | Filec.Text cur -> File_cursor (Filec.Text { cur with offset })
-  | Filec.Binary -> File_cursor Filec.Binary
-
 (* Extracts the file name from a tree node *)
 let file_name = function
   | File (name, _) -> name
@@ -70,29 +65,34 @@ let zipper_parents zipper =
 (* TODO: Horrible hardcoding of maximum lines view *)
 let span = 40
 
-let go_down zipper =
-  match zipper.current with
-  | Dir_cursor cursor ->
-      let len = Array.length cursor.files in
-      let new_pos = (cursor.pos + 1) mod len in
-      let new_cursor = Dir_cursor { cursor with pos = new_pos } in
-      { zipper with current = new_cursor }
-  | File_cursor cursor ->
-      let len = Filec.length cursor in
-      let new_offset = Filec.offset cursor + 1 in
-      if new_offset + span > len then zipper
-      else { zipper with current = update_cursor cursor new_offset }
+let move_cursor move_dir_cursor move_file_cursor cursor =
+  match cursor with
+  | Dir_cursor cursor -> Dir_cursor (move_dir_cursor cursor)
+  | File_cursor cursor -> File_cursor (move_file_cursor cursor)
 
-let go_up zipper =
-  match zipper.current with
-  | Dir_cursor cursor ->
-      let len = Array.length cursor.files in
-      let new_pos = (cursor.pos + len - 1) mod len in
-      let new_cursor = Dir_cursor { cursor with pos = new_pos } in
-      { zipper with current = new_cursor }
-  | File_cursor cursor ->
-      let new_offset = max 0 (Filec.offset cursor - 1) in
-      { zipper with current = update_cursor cursor new_offset }
+let move_dir_cursor move cursor =
+  let len = Array.length cursor.files in
+  let new_pos = (cursor.pos + move + len) mod len in
+  { cursor with pos = new_pos }
+
+let move_file_cursor move cursor =
+  let len = Filec.length cursor in
+  let new_offset = Filec.offset cursor + move in
+  if new_offset + span > len then cursor
+  else
+    match cursor with
+    | Text cur -> Text { cur with offset = new_offset }
+    | Binary -> cursor
+
+let go_move move zipper =
+  let move_dir = move_dir_cursor move in
+  let move_file = move_file_cursor move in
+  let old = zipper.current in
+  let new_cursor = move_cursor move_dir move_file old in
+  { zipper with current = new_cursor }
+
+let go_down zipper = go_move 1 zipper
+let go_up zipper = go_move (-1) zipper
 
 let go_next zipper =
   match zipper.current with
