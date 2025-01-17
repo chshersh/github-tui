@@ -78,6 +78,7 @@ let move_dir_cursor move cursor =
 let move_file_cursor move cursor =
   let len = Filec.length cursor in
   let new_offset = Filec.offset cursor + move in
+  let new_offset = max 0 new_offset in
   if new_offset + span > len then cursor
   else
     match cursor with
