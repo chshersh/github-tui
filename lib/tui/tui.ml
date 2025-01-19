@@ -49,7 +49,7 @@ let get_terminal_dimensions () =
 let init ~owner_repo ~local_path : Model.initial_data =
   let ({ owner; repo } as owner_repo) = parse_owner_repo owner_repo in
   let root_dir_path = clone_repo ~owner_repo ~local_path in
-  let files = read_root_tree ~root_dir_path in
+  let files = Lazy.force (read_root_tree ~root_dir_path) in
   let { height; width } = get_terminal_dimensions () in
   { owner; repo; root_dir_path; files; width; height }
 

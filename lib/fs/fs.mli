@@ -10,7 +10,7 @@ type file_contents =
 (** A definition of a file tree. *)
 type tree =
   | File of string * file_contents Lazy.t
-  | Dir of string * tree array
+  | Dir of string * tree array Lazy.t
 
 (** Return the name of a given tree node. *)
 val file_name : tree -> string
