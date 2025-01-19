@@ -41,8 +41,7 @@ let order_files t1 t2 =
 
 let rec sort_tree = function
   | File (name, contents) -> File (name, contents)
-  | Dir (name, children) ->
-      let children = Lazy.force children in
+  | Dir (name, lazy children) ->
       Array.sort order_files children;
       Dir (name, lazy (Array.map sort_tree children))
 
@@ -153,8 +152,7 @@ let go_next zipper =
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);
           }
-      | Dir (_, next) ->
-          let next = Lazy.force next in
+      | Dir (_, lazy next) ->
           if Array.length next = 0 then zipper
           else
             {
