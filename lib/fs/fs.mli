@@ -1,4 +1,5 @@
-(** Module for manipulating different file contents (text, binary) to get lines and current offsets. *)
+(** Module for manipulating different file contents (text, binary) to get lines
+    and current offsets. *)
 module Filec = Filec
 
 (** A definition of a file tree. *)
