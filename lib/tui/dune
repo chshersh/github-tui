@@ -5,6 +5,8 @@
   ;; Internal dependencies
   extra
   fs
+  gh
+  log
   pretty
   scroll
   shell

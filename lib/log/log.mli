@@ -3,4 +3,4 @@
     {v
 timestamp=1447865947.56802297 tag=event msg=Retry
     v} *)
-val log : path:string option -> tag:string -> msg:string -> unit
+val log : ?path:string -> tag:string -> string -> unit

@@ -1,2 +1,2 @@
 module Client = Client
-module Issues = Issues
+module Issue = Issue

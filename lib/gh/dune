@@ -1,3 +1,7 @@
 (library
  (name gh)
- (libraries ezcurl yojson))
+ (libraries
+  ezcurl
+  yojson
+  ;; Internal dependencies
+  log))

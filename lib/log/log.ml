@@ -1,4 +1,4 @@
-let log ~path ~tag ~msg =
+let log ?path ~tag msg =
   match path with
   | None -> ()
   | Some path ->

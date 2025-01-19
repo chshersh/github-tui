@@ -11,7 +11,7 @@ let mk_issues_query ~owner ~repo =
     {|
 query {
   repository(owner: "%s", name: "%s") {
-    issues(first: 2, states: [OPEN], orderBy: {field: CREATED_AT, direction: DESC}) {
+    issues(first: 10, states: [OPEN], orderBy: {field: CREATED_AT, direction: DESC}) {
         nodes {
           number
           title

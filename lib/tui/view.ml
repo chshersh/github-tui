@@ -1,3 +1,7 @@
+let repo_header (model : Model.t) =
+  let owner_repo = model.owner ^ "/" ^ model.repo in
+  Pretty.(fmt Style.repo owner_repo)
+
 let tabs_section cur_tab =
   let open Pretty in
   let sep = vertical [ str " "; str " "; str "─" ] in
@@ -17,11 +21,19 @@ let code_section (code_tab : Model.code_tab) =
   let fs_doc = Widget.file_view code_tab.fs in
   Pretty.vertical [ current_path_doc; fs_doc ]
 
+let issues_section (issues_tab : Model.issues_tab) =
+  let fmt_issue (issue : Gh.Issue.t) =
+    Printf.sprintf "#%d %s by %s" issue.number issue.title issue.author
+    |> Pretty.str
+  in
+  issues_tab.issues |> Lazy.force |> List.map fmt_issue |> Pretty.vertical
+
 let tab_content_section (model : Model.t) =
   let tab_doc =
     match model.current_tab with
     | Code -> code_section model.code_tab
-    | Issues | PullRequests -> Pretty.str ""
+    | Issues -> issues_section model.issues_tab
+    | PullRequests -> Pretty.str ""
   in
   tab_doc
 
@@ -29,7 +41,7 @@ let to_doc (model : Model.t) =
   let open Pretty in
   let empty = str "" in
   let about = Widget.about_doc model in
-  let repo = fmt Style.repo model.repo in
+  let repo = repo_header model in
   let tabs = tabs_section model.current_tab in
   let content = tab_content_section model in
 

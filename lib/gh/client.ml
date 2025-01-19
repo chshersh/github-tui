@@ -2,6 +2,7 @@ let github_api_url = "https://api.github.com/graphql"
 
 let query query_body =
   let token = Sys.getenv "GITHUB_TOKEN" in
+
   let response =
     Ezcurl.post ~params:[]
       ~headers:

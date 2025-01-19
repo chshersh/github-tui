@@ -1,6 +1,6 @@
 open Cmdliner
 
-let repo_arg =
+let owner_repo_arg =
   let doc = "The GitHub repository to view in TUI." in
   Arg.(value & pos 0 string "NOT_SPECIFIED" & info [] ~docv:"OWNER/REPO" ~doc)
 
@@ -18,8 +18,10 @@ let log_arg =
     & opt (some string) None
     & info [ "l"; "log-to" ] ~docv:"LOG_PATH" ~doc)
 
-let run repo local_path log_file = Tui.start ~repo ~local_path ~log_file
-let gh_tui_term = Term.(const run $ repo_arg $ path_arg $ log_arg)
+let run owner_repo local_path log_file =
+  Tui.start ~owner_repo ~local_path ~log_file
+
+let gh_tui_term = Term.(const run $ owner_repo_arg $ path_arg $ log_arg)
 
 let cmd =
   let doc = "TUI of a GitHub repository" in
