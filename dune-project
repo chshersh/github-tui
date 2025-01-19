@@ -26,6 +26,7 @@
    (terminal_size (>= "0.2.0"))
    (tty (>= "0.0.2"))
    (uutf (>= "1.0.3"))
+   yojson
  )
  (tags
   (tui cli git github)))
