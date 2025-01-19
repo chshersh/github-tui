@@ -71,10 +71,10 @@ let pwd root_dir_path (fs : Fs.zipper) =
   Pretty.(fmt Style.directory full_path)
 
 let file_contents_to_doc ~(file_contents : Fs.Filec.t) =
-  let lines = Fs.Filec.lines_from_file_contents file_contents in
+  let lines = Fs.Filec.lines file_contents in
   let len_lines = Array.length lines in
   let span = 40 in
-  let offset = Fs.Filec.offset_from_file_contents file_contents in
+  let offset = Fs.Filec.offset file_contents in
 
   let contents_span = Extra.List.of_sub_array ~offset ~len:span lines in
 

@@ -51,7 +51,7 @@ let rec to_tree path =
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
-  else File (Filename.basename path, lazy (Filec.read_file_contents path))
+  else File (Filename.basename path, lazy (Filec.read path))
 
 let read_tree path = path |> to_tree |> sort_tree
 let file_at cursor = cursor.files.(cursor.pos)
@@ -78,8 +78,8 @@ let go_down zipper =
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
   | File_cursor cursor ->
-      let len = Filec.line_len_from_file_contents cursor in
-      let new_offset = Filec.offset_from_file_contents cursor + 1 in
+      let len = Filec.length cursor in
+      let new_offset = Filec.offset cursor + 1 in
       if new_offset + span > len then zipper
       else { zipper with current = update_cursor cursor new_offset }
 
@@ -91,7 +91,7 @@ let go_up zipper =
       let new_cursor = Dir_cursor { cursor with pos = new_pos } in
       { zipper with current = new_cursor }
   | File_cursor cursor ->
-      let new_offset = max 0 (Filec.offset_from_file_contents cursor - 1) in
+      let new_offset = max 0 (Filec.offset cursor - 1) in
       { zipper with current = update_cursor cursor new_offset }
 
 let go_next zipper =

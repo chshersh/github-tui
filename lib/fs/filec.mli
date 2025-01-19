@@ -8,13 +8,13 @@ type t =
     }
 
 (** Reads file contents using 'bat' to have pretty syntax highlighting **)
-val read_file_contents : string -> t
+val read : string -> t
 
 (** Returns offset based on file type of contents **)
-val offset_from_file_contents : t -> int
+val offset : t -> int
 
 (** Returns the len of file contents **)
-val line_len_from_file_contents : t -> int
+val length : t -> int
 
 (** Returns the lines of file contents **)
-val lines_from_file_contents : t -> Pretty.doc array
+val lines : t -> Pretty.doc array

@@ -10,7 +10,9 @@ type t =
    is binary or not. Improve this if it becomes a problem.
 *)
 let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
-let binary_file_warning = "This file is binary and cannot be displayed"
+
+let binary_file_warning =
+  [| Pretty.str "This file is binary and cannot be displayed" |]
 
 let has_binary_warning contents =
   Str.string_match binary_file_pattern contents 0
@@ -21,7 +23,7 @@ let bat_cmd =
 let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
 
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
-let read_file_contents path =
+let read path =
   let contents = read_file_raw path in
   if has_binary_warning contents then Binary
   else
@@ -33,14 +35,15 @@ let read_file_contents path =
     in
     Text { lines; offset = 0 }
 
-let offset_from_file_contents = function
+let offset = function
   | Text { offset; _ } -> offset
   | Binary -> 0
 
-let line_len_from_file_contents = function
-  | Text { lines; _ } -> Array.length lines
-  | Binary -> 1
-
-let lines_from_file_contents = function
+(* Returns the lines of the file contents *)
+let lines = function
   | Text { lines; _ } -> lines
-  | Binary -> [| Pretty.str binary_file_warning |]
+  | Binary -> binary_file_warning
+
+(* Returns the number of lines in the file contents *)
+let length = function
+  | x -> Array.length (lines x)
