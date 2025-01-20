@@ -7,7 +7,7 @@ type file_contents =
 
 type tree =
   | File of string * file_contents Lazy.t
-  | Dir of string * tree array
+  | Dir of string * tree array Lazy.t
 
 (* Regex to used to determine if bat outputs a binary file warning. This is a
    bit of a fragile approach, but there is no robust way to determine if a file
@@ -41,9 +41,9 @@ let order_files t1 t2 =
 
 let rec sort_tree = function
   | File (name, contents) -> File (name, contents)
-  | Dir (name, children) ->
+  | Dir (name, (lazy children)) ->
       Array.sort order_files children;
-      Dir (name, Array.map sort_tree children)
+      Dir (name, lazy (Array.map sort_tree children))
 
 let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
 
@@ -64,9 +64,10 @@ let read_file_contents path =
 let rec to_tree path =
   if Sys.is_directory path then
     let children =
-      Array.map
-        (fun child_name -> to_tree (Filename.concat path child_name))
-        (Sys.readdir path)
+      lazy
+        (Array.map
+           (fun child_name -> to_tree (Filename.concat path child_name))
+           (Sys.readdir path))
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
@@ -151,7 +152,7 @@ let go_next zipper =
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);
           }
-      | Dir (_, next) ->
+      | Dir (_, (lazy next)) ->
           if Array.length next = 0 then zipper
           else
             {

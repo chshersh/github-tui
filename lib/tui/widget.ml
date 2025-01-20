@@ -105,8 +105,10 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
       match Lazy.force contents with
       | Fs.Text _ -> file_char ^ " " ^ pad name
       | Fs.Binary -> bin_char ^ " " ^ pad name)
-  | Dir (name, [||]) -> empty_dir_char ^ " " ^ pad name
-  | Dir (name, _) -> dir_char ^ " " ^ pad name
+  | Dir (name, (lazy children)) -> (
+      match children with
+      | [||] -> empty_dir_char ^ " " ^ pad name
+      | _ -> dir_char ^ " " ^ pad name)
 
 let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   let open Pretty in
@@ -201,7 +203,7 @@ type selected_node =
   | Dir_selected of {
       prev_total : int;
       pos : int;
-      children : Fs.tree array;
+      children : Fs.tree array Lazy.t;
     }
 
 let next_level_to_doc selected_node =
@@ -209,11 +211,13 @@ let next_level_to_doc selected_node =
   match selected_node with
   | File_selected file_contents ->
       File_contents (file_contents_to_doc ~file_contents)
-  (* No children of a directory without children *)
-  | Dir_selected { children = [||]; _ } -> Empty_directory
-  (* Non-empty array of children *)
-  | Dir_selected { prev_total; pos; children } ->
-      Directory_contents (children_to_doc ~prev_total ~pos children)
+  | Dir_selected { children; prev_total; pos } -> (
+      let children = Lazy.force children in
+      match children with
+      (* No children of a directory without children *)
+      | [||] -> Empty_directory
+      (* Non-empty array of children *)
+      | _ -> Directory_contents (children_to_doc ~prev_total ~pos children))
 
 type fs_view = {
   left : Fs.dir_cursor;
