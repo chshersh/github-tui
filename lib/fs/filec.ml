@@ -45,5 +45,4 @@ let lines = function
   | Binary -> binary_file_warning
 
 (* Returns the number of lines in the file contents *)
-let length = function
-  | x -> Array.length (lines x)
+let length filec = filec |> lines |> Array.length
