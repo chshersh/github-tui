@@ -70,11 +70,11 @@ let pwd root_dir_path (fs : Fs.zipper) =
   let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
   Pretty.(fmt Style.directory full_path)
 
-let file_contents_to_doc ~(file_contents : Fs.file_contents) =
-  let lines = Fs.lines_from_file_contents file_contents in
+let file_contents_to_doc ~(file_contents : Fs.Filec.t) =
+  let lines = Fs.Filec.lines file_contents in
   let len_lines = Array.length lines in
   let span = 40 in
-  let offset = Fs.offset_from_file_contents file_contents in
+  let offset = Fs.Filec.offset file_contents in
 
   let contents_span = Extra.List.of_sub_array ~offset ~len:span lines in
 
@@ -103,8 +103,8 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
   match tree with
   | File (name, contents) -> (
       match Lazy.force contents with
-      | Fs.Text _ -> file_char ^ " " ^ pad name
-      | Fs.Binary -> bin_char ^ " " ^ pad name)
+      | Fs.Filec.Text _ -> file_char ^ " " ^ pad name
+      | Fs.Filec.Binary -> bin_char ^ " " ^ pad name)
   | Dir (name, (lazy children)) -> (
       match children with
       | [||] -> empty_dir_char ^ " " ^ pad name
@@ -199,7 +199,7 @@ let is_directory_contents = function
   | _ -> false
 
 type selected_node =
-  | File_selected of Fs.file_contents
+  | File_selected of Fs.Filec.t
   | Dir_selected of {
       prev_total : int;
       pos : int;

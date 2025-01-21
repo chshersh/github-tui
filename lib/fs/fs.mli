@@ -1,15 +1,10 @@
-(** File contents as an array of lines, where each line is wrapped into a
-    document (for rendering efficiency) *)
-type file_contents =
-  | Binary
-  | Text of {
-      lines : Pretty.doc array;
-      offset : int;
-    }
+(** Module for manipulating different file contents (text, binary) to get lines
+    and current offsets. *)
+module Filec = Filec
 
 (** A definition of a file tree. *)
 type tree =
-  | File of string * file_contents Lazy.t
+  | File of string * Filec.t Lazy.t
   | Dir of string * tree array Lazy.t
 
 (** Return the name of a given tree node. *)
@@ -26,7 +21,7 @@ type dir_cursor = {
 
 type cursor =
   | Dir_cursor of dir_cursor
-  | File_cursor of file_contents
+  | File_cursor of Filec.t
 
 (** Return the currently selected file in file cursor. *)
 val file_at : dir_cursor -> tree
@@ -55,12 +50,3 @@ val go_next : zipper -> zipper
 
 (** Move to the parent directory. *)
 val go_back : zipper -> zipper
-
-(** Return line length for arbitrary file *)
-val line_len_from_file_contents : file_contents -> int
-
-(** Return lines for arbitrary file *)
-val lines_from_file_contents : file_contents -> Pretty.doc array
-
-(** Return offset for arbitrary file *)
-val offset_from_file_contents : file_contents -> int
