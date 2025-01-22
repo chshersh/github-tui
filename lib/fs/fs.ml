@@ -65,8 +65,7 @@ let zipper_parents zipper =
 (* TODO: Horrible hardcoding of maximum lines view *)
 let span = 40
 
-let move_cursor move_dir_cursor move_file_cursor cursor =
-  match cursor with
+let move_cursor move_dir_cursor move_file_cursor = function
   | Dir_cursor cursor -> Dir_cursor (move_dir_cursor cursor)
   | File_cursor cursor -> File_cursor (move_file_cursor cursor)
 
@@ -92,8 +91,8 @@ let go_move move zipper =
   let new_cursor = move_cursor move_dir move_file old in
   { zipper with current = new_cursor }
 
-let go_down zipper = go_move 1 zipper
-let go_up zipper = go_move (-1) zipper
+let go_down = go_move 1
+let go_up = go_move (-1)
 
 let go_next zipper =
   match zipper.current with
