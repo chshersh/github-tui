@@ -18,3 +18,12 @@ val append : t -> t -> t
 
 (** Format a single line as string, applying formatting. *)
 val fmt : t -> string
+
+(** [zip_lines l r] zips two lists of lines horizontally. Meaning:
+
+    - The size of the result is the maximum of both sizes
+    - Element concatenated pairwise
+    - If the first list is longer, elements from it are taken as is
+    - If the second list is longer, the maximum size of elements from the first
+      list is added as padding. *)
+val zip_lines : t list -> t list -> t list
