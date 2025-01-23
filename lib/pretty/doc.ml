@@ -12,48 +12,18 @@ let horizontal cols = Horizontal cols
 let vertical rows = Vertical rows
 let horizontal_fill filler = Horizontal_fill filler
 
-let zip_lines (l : Line.t list) (r : Line.t list) =
-  let max_len_l = List.map Line.length l |> List.fold_left max 0 in
-
-  let rec zip l r =
-    match (l, r) with
-    | l, [] -> l
-    | [], r ->
-        (* Optimisation: Add extra chunk only if padding is needed *)
-        if max_len_l > 0 then
-          let padding_chunk = Chunk.replicate max_len_l " " in
-          List.map (Line.prepend_chunk padding_chunk) r
-        else r
-    | hd_l :: tl_l, hd_r :: tl_r ->
-        let left_len = Line.length hd_l in
-
-        (* Optimisation: Combine chunks when left is already max len *)
-        if left_len >= max_len_l then
-          let new_line = Line.append hd_l hd_r in
-          new_line :: zip tl_l tl_r
-        else
-          let padding_chunk = Chunk.replicate (max_len_l - left_len) " " in
-          let new_line =
-            Line.append hd_l
-              (Line.append (Line.of_chunks [ padding_chunk ]) hd_r)
-          in
-          new_line :: zip tl_l tl_r
-  in
-
-  zip l r
-
 type prerender =
-  | Rendered of Line.t list
+  | Rendered of Layout.t
   | Fill of string
 
-let rec render_to_lines ~width = function
-  | Str (styles, string) -> [ Line.of_chunks [ { styles; string } ] ]
+let rec render ~width = function
+  | Str (styles, string) -> Layout.fmt styles string
   | Horizontal_fill filler ->
-      [ Line.of_chunks [ Chunk.replicate width filler ] ]
-  | Vertical rows -> List.concat_map (render_to_lines ~width) rows
-  | Horizontal cols -> horizontal_to_lines ~width cols
+      filler |> Extra.String.repeat_txt width |> Layout.str
+  | Vertical rows -> rows |> List.map (render ~width) |> Layout.vertical
+  | Horizontal cols -> horizontal_to_layout ~width cols
 
-and horizontal_to_lines ~width cols =
+and horizontal_to_layout ~width cols =
   (* Step [prerender]. Check if there's Horizontal_fill, render everything else
      and calculate rendered size. *)
   let size_taken, prerendered =
@@ -65,9 +35,9 @@ and horizontal_to_lines ~width cols =
           | other ->
               (* WARNING: The leftmost horizontal fill will consume all the remaining width *)
               let remaining_width = width - size_taken in
-              let rendered = render_to_lines ~width:remaining_width other in
-              let max_line_width = Extra.List.max_on Line.length rendered in
-              (size_taken + max_line_width, Rendered rendered)
+              let layout = render ~width:remaining_width other in
+              let max_line_width = Layout.width layout in
+              (size_taken + max_line_width, Rendered layout)
         in
         (* TODO: Adding to the end of the list is suboptimal *)
         (new_size_taken, prerendered @ [ new_prerendered ]))
@@ -77,26 +47,10 @@ and horizontal_to_lines ~width cols =
   (* Step [fill_size]. Calculate the size of remaining fill *)
   let fill_width = width - size_taken in
 
-  (* Step [fill]. Fill the first Horizontal_fill *)
-  let _, rendered =
-    List.fold_left
-      (fun (remaining_width, rendered) prerendered ->
-        match prerendered with
-        | Rendered lines -> (remaining_width, rendered @ [ lines ])
-        | Fill filler ->
-            ( 0,
-              rendered
-              @ [
-                  [ Line.of_chunks [ Chunk.replicate remaining_width filler ] ];
-                ] ))
-      (fill_width, []) prerendered
-  in
-
-  (* Step [combine]. Combine the final columns of lines. *)
-  match rendered with
-  | [] -> []
-  (* TODO: This has quadratic time complexity; optimise *)
-  | hd :: tl -> List.fold_left zip_lines hd tl
-
-let render ~width doc =
-  doc |> render_to_lines ~width |> List.map Line.fmt |> Extra.String.unlines
+  (* Step [combine]. Extract rendered layouts and fill the missing part. *)
+  prerendered
+  |> List.map (function
+       | Rendered layout -> layout
+       | Fill filler ->
+           filler |> Extra.String.repeat_txt fill_width |> Layout.str)
+  |> Layout.horizontal

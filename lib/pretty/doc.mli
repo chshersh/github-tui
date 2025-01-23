@@ -30,4 +30,4 @@ val horizontal_fill : string -> t
 
     * [width]: the max allowed width for the document. Passed recursively and
     currently only used for [horizontal_fill]. *)
-val render : width:int -> t -> string
+val render : width:int -> t -> Layout.t
