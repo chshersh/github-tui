@@ -1,9 +1,9 @@
 let repo_header (model : Model.t) =
   let owner_repo = model.owner ^ "/" ^ model.repo in
-  Pretty.(fmt Style.repo owner_repo)
+  Pretty.Doc.(fmt Style.repo owner_repo)
 
 let tabs_section cur_tab =
-  let open Pretty in
+  let open Pretty.Doc in
   let sep = vertical [ str " "; str " "; str "─" ] in
   let line = vertical [ str " "; str " "; horizontal_fill "─" ] in
   horizontal
@@ -19,11 +19,11 @@ let tabs_section cur_tab =
 let code_section (code_tab : Model.code_tab) =
   let current_path_doc = Widget.pwd code_tab.root_dir_path code_tab.fs in
   let fs_doc = Widget.file_view code_tab.fs in
-  Pretty.vertical [ current_path_doc; fs_doc ]
+  Pretty.Doc.vertical [ current_path_doc; fs_doc ]
 
 let issues_section (issues_tab : Model.issues_tab) =
   let fmt_issue (issue : Gh.Issue.t) =
-    Pretty.(
+    Pretty.Doc.(
       horizontal
         [
           str " ";
@@ -33,19 +33,19 @@ let issues_section (issues_tab : Model.issues_tab) =
           fmt Style.bold (Printf.sprintf "@%s" issue.author);
         ])
   in
-  issues_tab.issues |> Lazy.force |> List.map fmt_issue |> Pretty.vertical
+  issues_tab.issues |> Lazy.force |> List.map fmt_issue |> Pretty.Doc.vertical
 
 let tab_content_section (model : Model.t) =
   let tab_doc =
     match model.current_tab with
     | Code -> code_section model.code_tab
     | Issues -> issues_section model.issues_tab
-    | PullRequests -> Pretty.str ""
+    | PullRequests -> Pretty.Doc.str ""
   in
   tab_doc
 
 let to_doc (model : Model.t) =
-  let open Pretty in
+  let open Pretty.Doc in
   let empty = str "" in
   let about = Widget.about_doc model in
   let repo = repo_header model in
@@ -61,4 +61,5 @@ let to_doc (model : Model.t) =
       empty;
     ]
 
-let view (model : Model.t) = model |> to_doc |> Pretty.render ~width:model.width
+let view (model : Model.t) =
+  model |> to_doc |> Pretty.Doc.render ~width:model.width

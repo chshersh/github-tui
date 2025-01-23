@@ -11,12 +11,12 @@ let about_doc (model: Model.t) =
       "└───────────────────┘";
     ]
   in
-  let open Pretty in
+  let open Pretty.Doc in
   widget |> List.map (fmt ANSITerminal.[ cyan ]) |> vertical
   [@@ocamlformat "disable"]
 
 let tab_doc ~is_selected tab_lines =
-  let open Pretty in
+  let open Pretty.Doc in
   let format = if is_selected then fmt Style.selected else str in
   tab_lines |> List.map format |> vertical
 
@@ -45,14 +45,14 @@ let scroll ~lines ~span ~offset =
   let height = 40 in
   let scroll = Scroll.make ~height ~span ~lines ~offset in
   match scroll with
-  | None -> Pretty.str " "
+  | None -> Pretty.Doc.str " "
   | Some scroll ->
       let sections = Scroll.to_sections scroll in
-      let before = List.init sections.before (fun _ -> Pretty.str "░") in
-      let scroll = List.init sections.scroll (fun _ -> Pretty.str "█") in
-      let after = List.init sections.after (fun _ -> Pretty.str "░") in
+      let before = List.init sections.before (fun _ -> Pretty.Doc.str "░") in
+      let scroll = List.init sections.scroll (fun _ -> Pretty.Doc.str "█") in
+      let after = List.init sections.after (fun _ -> Pretty.Doc.str "░") in
       let scroll_bar = before @ scroll @ after in
-      Pretty.vertical scroll_bar
+      Pretty.Doc.vertical scroll_bar
 
 let pwd_char = "\u{e5fd}"
 let dir_char = "\u{f4d4}"
@@ -68,7 +68,7 @@ let pwd root_dir_path (fs : Fs.zipper) =
   let pwd_path = parents_path parents in
   let root_dir_name = Filename.basename root_dir_path in
   let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
-  Pretty.(fmt Style.directory full_path)
+  Pretty.Doc.(fmt Style.directory full_path)
 
 let file_contents_to_doc ~(file_contents : Fs.Filec.t) =
   let lines = Fs.Filec.lines file_contents in
@@ -79,8 +79,8 @@ let file_contents_to_doc ~(file_contents : Fs.Filec.t) =
   let contents_span = Extra.List.of_sub_array ~offset ~len:span lines in
 
   let scroll_doc = scroll ~lines:len_lines ~span ~offset in
-  let contents_doc = Pretty.vertical contents_span in
-  Pretty.(horizontal [ scroll_doc; str " "; contents_doc ])
+  let contents_doc = Pretty.Doc.vertical contents_span in
+  Pretty.Doc.(horizontal [ scroll_doc; str " "; contents_doc ])
 
 (* Extra padding for:
 
@@ -111,7 +111,7 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
       | _ -> dir_char ^ " " ^ pad name)
 
 let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
-  let open Pretty in
+  let open Pretty.Doc in
   let max_name_len = max_file_name_len cursor.files in
   let max_len = max_name_len + file_name_padding in
 
@@ -141,7 +141,7 @@ let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   |> vertical
 
 let children_to_doc ~prev_total ~pos children =
-  let open Pretty in
+  let open Pretty.Doc in
   let max_name_len = max_file_name_len children in
   let max_len = max_name_len + file_name_padding in
 
@@ -191,8 +191,8 @@ let children_to_doc ~prev_total ~pos children =
 
 type next_level =
   | Empty_directory
-  | Directory_contents of Pretty.doc
-  | File_contents of Pretty.doc
+  | Directory_contents of Pretty.Doc.t
+  | File_contents of Pretty.Doc.t
 
 let is_directory_contents = function
   | Directory_contents _ -> true
@@ -266,4 +266,4 @@ let file_view (fs : Fs.zipper) =
   match next_level_doc with
   | Empty_directory -> current_level_doc
   | Directory_contents next_level_doc | File_contents next_level_doc ->
-      Pretty.horizontal [ current_level_doc; next_level_doc ]
+      Pretty.Doc.horizontal [ current_level_doc; next_level_doc ]

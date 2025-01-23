@@ -1,7 +1,7 @@
 type t =
   | Binary
   | Text of {
-      lines : Pretty.doc array;
+      lines : Pretty.Doc.t array;
       offset : int;
     }
 
@@ -12,7 +12,7 @@ type t =
 let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
 
 let binary_file_warning =
-  [| Pretty.str "This file is binary and cannot be displayed" |]
+  [| Pretty.Doc.str "This file is binary and cannot be displayed" |]
 
 let has_binary_warning contents =
   Str.string_match binary_file_pattern contents 0
@@ -30,7 +30,7 @@ let read path =
     let lines =
       contents
       |> String.split_on_char '\n'
-      |> List.map Pretty.str
+      |> List.map Pretty.Doc.str
       |> Array.of_list
     in
     Text { lines; offset = 0 }

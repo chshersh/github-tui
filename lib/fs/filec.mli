@@ -3,7 +3,7 @@
 type t =
   | Binary
   | Text of {
-      lines : Pretty.doc array;
+      lines : Pretty.Doc.t array;
       offset : int;
     }
 
@@ -17,4 +17,4 @@ val offset : t -> int
 val length : t -> int
 
 (** Returns the lines of file contents **)
-val lines : t -> Pretty.doc array
+val lines : t -> Pretty.Doc.t array
