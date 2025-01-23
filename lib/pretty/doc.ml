@@ -16,6 +16,8 @@ type prerender =
   | Rendered of Layout.t
   | Fill of string
 
+let ( += ) ref x = ref := !ref + x
+
 let rec render ~width = function
   | Str (styles, string) -> Layout.fmt styles string
   | Horizontal_fill filler ->
@@ -26,29 +28,26 @@ let rec render ~width = function
 and horizontal_to_layout ~width cols =
   (* Step [prerender]. Check if there's Horizontal_fill, render everything else
      and calculate rendered size. *)
-  let size_taken, prerendered =
-    List.fold_left
-      (fun (size_taken, prerendered) col ->
-        let new_size_taken, new_prerendered =
-          match col with
-          | Horizontal_fill filler -> (size_taken, Fill filler)
-          | other ->
-              (* WARNING: The leftmost horizontal fill will consume all the remaining width *)
-              let remaining_width = width - size_taken in
-              let layout = render ~width:remaining_width other in
-              let max_line_width = Layout.width layout in
-              (size_taken + max_line_width, Rendered layout)
-        in
-        (* TODO: Adding to the end of the list is suboptimal *)
-        (new_size_taken, prerendered @ [ new_prerendered ]))
-      (0, []) cols
-  in
+  let len = List.length cols in
+  let size_taken = ref 0 in
+  let prerendered = Array.make len (Fill "") in
+
+  ListLabels.iteri cols ~f:(fun i col ->
+      match col with
+      | Horizontal_fill filler -> prerendered.(i) <- Fill filler
+      | other ->
+          (* WARNING: The leftmost horizontal fill will consume all the remaining width *)
+          let remaining_width = width - !size_taken in
+          let layout = render ~width:remaining_width other in
+          size_taken += Layout.width layout;
+          prerendered.(i) <- Rendered layout);
 
   (* Step [fill_size]. Calculate the size of remaining fill *)
-  let fill_width = width - size_taken in
+  let fill_width = width - !size_taken in
 
   (* Step [combine]. Extract rendered layouts and fill the missing part. *)
   prerendered
+  |> Array.to_list
   |> List.map (function
        | Rendered layout -> layout
        | Fill filler ->
