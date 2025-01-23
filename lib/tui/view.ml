@@ -23,8 +23,15 @@ let code_section (code_tab : Model.code_tab) =
 
 let issues_section (issues_tab : Model.issues_tab) =
   let fmt_issue (issue : Gh.Issue.t) =
-    Printf.sprintf "#%d %s by %s" issue.number issue.title issue.author
-    |> Pretty.str
+    Pretty.(
+      horizontal
+        [
+          str " ";
+          fmt Style.secondary (Printf.sprintf "#%d " issue.number);
+          str issue.title;
+          str " by ";
+          fmt Style.bold (Printf.sprintf "@%s" issue.author);
+        ])
   in
   issues_tab.issues |> Lazy.force |> List.map fmt_issue |> Pretty.vertical
 
