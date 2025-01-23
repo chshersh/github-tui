@@ -1,14 +1,9 @@
 (library
- (name tui)
+ (name widget)
  (libraries
-  terminal_size
   ;; Internal dependencies
   extra
   fs
-  gh
-  log
   model
   pretty
-  shell
-  tea
-  widget))
+  scroll))
