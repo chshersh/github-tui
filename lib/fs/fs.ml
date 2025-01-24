@@ -79,7 +79,7 @@ let move_file_cursor move cursor =
   | Filec.Binary -> cursor
   | Filec.Text txt_cur ->
       let len = Filec.length cursor in
-      let new_offset = move |> ( + ) (Filec.offset cursor) |> max 0 in
+      let new_offset = Filec.offset cursor + move in
       if new_offset < 0 || new_offset + span > len then cursor
       else Filec.Text { txt_cur with offset = new_offset }
 
