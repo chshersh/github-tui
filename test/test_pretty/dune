@@ -1,0 +1,7 @@
+(library
+ (name test_pretty)
+ (libraries
+  alcotest
+  ; Internal libraries
+  pretty
+  test_extra))

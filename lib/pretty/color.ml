@@ -1,5 +1,8 @@
 type t = RGB of int * int * int
 
+let pp fmt (RGB (r, g, b)) = Format.fprintf fmt "RGB(%d,%d,%d)" r g b
+let show = Format.asprintf "%a" pp
+
 let to_255 str =
   match int_of_string_opt ("0x" ^ str) with
   | None -> 0
@@ -10,7 +13,6 @@ let rgb r g b = RGB (to_255 r, to_255 g, to_255 b)
 let rgb str =
   match String.to_seq str |> List.of_seq |> List.map (String.make 1) with
   | [ "#"; r1; r2; g1; g2; b1; b2 ] -> rgb (r1 ^ r2) (g1 ^ g2) (b1 ^ b2)
-  | [ "#"; r1; g1; b1 ] -> rgb r1 g1 b1
   | _ -> RGB (0, 0, 0)
 
 let of_hex str =
