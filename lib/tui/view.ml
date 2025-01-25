@@ -23,7 +23,7 @@ let code_section (code_tab : Model.code_tab) =
 
 let issues_section (issues_tab : Model.issues_tab) =
   let fmt_issue (issue : Gh.Issue.t) =
-    Pretty.Doc.(
+    Pretty.Layout.(
       horizontal
         [
           str " ";
@@ -33,7 +33,10 @@ let issues_section (issues_tab : Model.issues_tab) =
           fmt Style.bold (Printf.sprintf "@%s" issue.author);
         ])
   in
-  issues_tab.issues |> Lazy.force |> List.map fmt_issue |> Pretty.Doc.vertical
+  issues_tab.issues
+  |> Lazy.force
+  |> List.map fmt_issue
+  |> Widget.Generic.vlist_border
 
 let tab_content_section (model : Model.t) =
   let tab_doc =

@@ -1,3 +1,5 @@
+module Generic = Generic
+
 let about_doc (model: Model.t) =
   let widget =
     [
