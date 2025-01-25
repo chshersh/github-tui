@@ -65,34 +65,12 @@ let issues_section (issues_tab : Model.issues_tab) =
   |> List.map fmt_issue
   |> Widget.Generic.vlist_border
 
-let pr_section (pr_tab : Model.pull_requests_tab) =
-  let open Pretty.Doc in
-  let fmt_state = function
-    | None -> str ""
-    | Some Gh.Pr.Merged -> fmt Style.pr_merged "\u{e725}"
-    | Some Gh.Pr.Open -> fmt Style.pr_open "\u{ea64}"
-    | Some Gh.Pr.Closed -> fmt Style.pr_closed "\u{ebda}"
-  in
-  let fmt_pr (pr : Gh.Pr.t) =
-    Pretty.Doc.(
-      horizontal
-        [
-          fmt_state pr.state;
-          str " ";
-          fmt Style.secondary (Printf.sprintf "#%d " pr.number);
-          str pr.title;
-          str " by ";
-          fmt Style.bold (Printf.sprintf "@%s" pr.author);
-        ])
-  in
-  pr_tab.pull_requests |> Lazy.force |> List.map fmt_pr |> Pretty.Doc.vertical
-
 let tab_content_section (model : Model.t) =
   let tab_doc =
     match model.current_tab with
     | Code -> code_section model.code_tab
     | Issues -> issues_section model.issues_tab
-    | PullRequests -> pr_section model.pull_requests_tab
+    | PullRequests -> Widget.Pr.section model.pull_requests_tab
   in
   tab_doc
 
