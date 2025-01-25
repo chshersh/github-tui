@@ -44,7 +44,8 @@ query {
   "title": "GitHub TUI: Release Tracker for v1.0",
   "author": {
     "login": "chshersh"
-  }
+  },
+  "state": "MERGED"
 }
 *)
 let parse_pr json =
@@ -65,7 +66,8 @@ let parse_pr json =
             "title": "Switch to setup-ocaml@v3",
             "author": {
               "login": "chshersh"
-            }
+            },
+            "state": "MERGED"
           },
           ...
 *)
