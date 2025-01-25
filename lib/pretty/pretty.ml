@@ -1,3 +1,4 @@
+module Color = Color
 module Doc = Doc
 module Layout = Layout
 
