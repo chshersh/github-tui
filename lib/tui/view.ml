@@ -16,15 +16,10 @@ let tabs_section cur_tab =
       line;
     ]
 
-let code_section (code_tab : Model.code_tab) =
-  let current_path_doc = Widget.pwd code_tab.root_dir_path code_tab.fs in
-  let fs_doc = Widget.file_view code_tab.fs in
-  Pretty.Doc.vertical [ current_path_doc; fs_doc ]
-
 let tab_content_section (model : Model.t) =
   let tab_doc =
     match model.current_tab with
-    | Code -> code_section model.code_tab
+    | Code -> Widget.Code.section model.code_tab
     | Issues -> Widget.Issue.section model.issues_tab
     | PullRequests -> Widget.Pr.section model.pull_requests_tab
   in
