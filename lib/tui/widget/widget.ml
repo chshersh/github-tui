@@ -1,4 +1,5 @@
 module Generic = Generic
+module Pr = Pr
 
 let about_doc (model: Model.t) =
   let widget =

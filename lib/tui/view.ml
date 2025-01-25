@@ -70,7 +70,7 @@ let tab_content_section (model : Model.t) =
     match model.current_tab with
     | Code -> code_section model.code_tab
     | Issues -> issues_section model.issues_tab
-    | PullRequests -> Pretty.Doc.str ""
+    | PullRequests -> Widget.Pr.section model.pull_requests_tab
   in
   tab_doc
 
