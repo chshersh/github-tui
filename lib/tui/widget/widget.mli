@@ -1,3 +1,4 @@
+module Issue = Issue
 module Pr = Pr
 module Generic = Generic
 

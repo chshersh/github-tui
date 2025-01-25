@@ -1,5 +1,6 @@
-module Generic = Generic
+module Issue = Issue
 module Pr = Pr
+module Generic = Generic
 
 let about_doc (model: Model.t) =
   let widget =
