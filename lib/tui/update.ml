@@ -4,15 +4,22 @@ let move_fs move_fn (code_tab : Model.code_tab) =
   let fs = move_fn code_tab.fs in
   { code_tab with fs }
 
+let move_issues move (issues_tab : Model.issues_tab) =
+  let len = issues_tab.issues |> Lazy.force |> List.length in
+  let offset = (issues_tab.offset + move + len) mod len in
+  { issues_tab with offset }
+
 let move_up (model : Model.t) =
   match model.current_tab with
   | Code -> { model with code_tab = move_fs Fs.go_up model.code_tab }
-  | Issues | PullRequests -> model
+  | Issues -> { model with issues_tab = move_issues (-1) model.issues_tab }
+  | PullRequests -> model
 
 let move_down (model : Model.t) =
   match model.current_tab with
   | Code -> { model with code_tab = move_fs Fs.go_down model.code_tab }
-  | Issues | PullRequests -> model
+  | Issues -> { model with issues_tab = move_issues 1 model.issues_tab }
+  | PullRequests -> model
 
 let move_back (model : Model.t) =
   match model.current_tab with

@@ -5,7 +5,11 @@ type code_tab = {
   fs : Fs.zipper;
 }
 
-type issues_tab = { issues : Gh.Issue.t list Lazy.t }
+type issues_tab = {
+  issues : Gh.Issue.t list Lazy.t;
+  offset : int;
+}
+
 type pull_requests_tab = { pull_requests : Gh.Pr.t list Lazy.t }
 
 type tab =
@@ -43,7 +47,7 @@ let initial_model { owner; repo; root_dir_path; files; width; height } =
     repo;
     current_tab = Code;
     code_tab = { root_dir_path; fs = Fs.zip_it files };
-    issues_tab = { issues = lazy (Gh.Issue.issues ~owner ~repo) };
+    issues_tab = { issues = lazy (Gh.Issue.issues ~owner ~repo); offset = 0 };
     pull_requests_tab =
       { pull_requests = lazy (Gh.Pr.pull_requests ~owner ~repo) };
   }

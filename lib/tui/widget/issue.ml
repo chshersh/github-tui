@@ -37,4 +37,7 @@ let section (issues_tab : Model.issues_tab) =
   let fmt_issue (issue : Gh.Issue.t) =
     vertical [ fmt_title issue; fmt_labels issue.labels ]
   in
-  issues_tab.issues |> Lazy.force |> List.map fmt_issue |> Generic.vlist_border
+  issues_tab.issues
+  |> Lazy.force
+  |> List.map fmt_issue
+  |> Generic.vlist_border ~selected:issues_tab.offset
