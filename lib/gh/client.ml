@@ -23,6 +23,6 @@ let parse_response (path : string list) (parse_item : Yojson.Basic.t -> 'a) json
     =
   json
   |> Yojson.Basic.from_string
-  |> Json.path path (*[ "data"; "repository"; "issues"; "nodes" ]*)
+  |> Json.path path
   |> Option.value ~default:(`List [])
   |> Json.convert_each parse_item
