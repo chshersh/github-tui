@@ -1,2 +1,6 @@
 (test
- (name test_github_tui))
+ (name test)
+ (libraries
+  alcotest
+  ; Internal tests
+  test_pretty))

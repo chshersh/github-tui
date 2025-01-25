@@ -1,7 +1,13 @@
 (** This module provides utilities to work with colors. *)
 
 (** An RGB colour code *)
-type t
+type t = RGB of int * int * int
+
+(** Pretty-printing formatter. *)
+val pp : Format.formatter -> t -> unit
+
+(** Pretty-print as a string. Use for debugging or testing only. *)
+val show : t -> string
 
 (** Returns RGB colour from a hex string like "7057f" or "#fbca04".
 

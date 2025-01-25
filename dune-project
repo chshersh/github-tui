@@ -27,6 +27,11 @@
    (tty (>= "0.0.2"))
    (uutf (>= "1.0.3"))
    yojson
+
+   (alcotest
+     (and
+       :with-test
+       (>= 1.3.0)))
  )
  (tags
   (tui cli git github)))
