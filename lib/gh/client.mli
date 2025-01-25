@@ -24,3 +24,6 @@
       |}
     ]} *)
 val query : string -> string
+
+(** Parse the response from the above query **)
+val parse_response : string list -> (Yojson.Basic.t -> 'a) -> string -> 'a list

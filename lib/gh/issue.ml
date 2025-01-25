@@ -103,12 +103,9 @@ let parse_issue json =
   }
 }
 *)
-let parse_issues json =
-  json
-  |> Yojson.Basic.from_string
-  |> Json.path [ "data"; "repository"; "issues"; "nodes" ]
-  |> Option.value ~default:(`List [])
-  |> Json.convert_each parse_issue
+let issue_json_path = [ "data"; "repository"; "issues"; "nodes" ]
 
 let issues ~owner ~repo =
-  mk_issues_query ~owner ~repo |> Client.query |> parse_issues
+  mk_issues_query ~owner ~repo
+  |> Client.query
+  |> Client.parse_response issue_json_path parse_issue

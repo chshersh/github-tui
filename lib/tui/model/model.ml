@@ -6,6 +6,7 @@ type code_tab = {
 }
 
 type issues_tab = { issues : Gh.Issue.t list Lazy.t }
+type pull_requests_tab = { pull_requests : Gh.Pr.t list Lazy.t }
 
 type tab =
   | Code
@@ -22,6 +23,7 @@ type t = {
   current_tab : tab;
   code_tab : code_tab;
   issues_tab : issues_tab;
+  pull_requests_tab : pull_requests_tab;
 }
 
 type initial_data = {
@@ -42,4 +44,6 @@ let initial_model { owner; repo; root_dir_path; files; width; height } =
     current_tab = Code;
     code_tab = { root_dir_path; fs = Fs.zip_it files };
     issues_tab = { issues = lazy (Gh.Issue.issues ~owner ~repo) };
+    pull_requests_tab =
+      { pull_requests = lazy (Gh.Pr.pull_requests ~owner ~repo) };
   }

@@ -5,3 +5,6 @@ module Issue = Issue
 
 (** Generic client to submit GraphQL queries to GitHub API. *)
 module Client = Client
+
+(** Queries and types related to pull requests. *)
+module Pr = Pr
