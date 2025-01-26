@@ -4,7 +4,7 @@ module Filec = Filec
 
 (** A definition of a file tree. *)
 type tree =
-  | File of string * Filec.t Lazy.t
+  | File of string * Filec.t Lazy.t * Filec.file_type Lazy.t
   | Dir of string * tree array Lazy.t
 
 (** Return the name of a given tree node. *)

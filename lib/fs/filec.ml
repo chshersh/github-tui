@@ -43,6 +43,15 @@ let read path =
     in
     Text { lines; offset = 0 }
 
+type file_type =
+  | BinaryFile
+  | TextFile
+
+(* Returns file type based on contents *)
+let type_of_path path = if is_likely_binary path then BinaryFile else TextFile
+
+(* Returns offset based on file type of contents *)
+
 let offset = function
   | Text { offset; _ } -> offset
   | Binary -> 0

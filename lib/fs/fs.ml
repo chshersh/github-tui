@@ -1,7 +1,7 @@
 module Filec = Filec
 
 type tree =
-  | File of string * Filec.t Lazy.t
+  | File of string * Filec.t Lazy.t * Filec.file_type Lazy.t
   | Dir of string * tree array Lazy.t
 
 type dir_cursor = {
@@ -15,7 +15,7 @@ type cursor =
 
 (* Extracts the file name from a tree node *)
 let file_name = function
-  | File (name, _) -> name
+  | File (name, _, _) -> name
   | Dir (name, _) -> name
 
 (* A files comparison:
@@ -30,7 +30,7 @@ let order_files t1 t2 =
   | _, _ -> String.compare (file_name t1) (file_name t2)
 
 let rec sort_tree = function
-  | File (name, contents) -> File (name, contents)
+  | File (name, contents, ft) -> File (name, contents, ft)
   | Dir (name, (lazy children)) ->
       Array.sort order_files children;
       Dir (name, lazy (Array.map sort_tree children))
@@ -46,7 +46,11 @@ let rec to_tree path =
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
-  else File (Filename.basename path, lazy (Filec.read path))
+  else
+    File
+      ( Filename.basename path,
+        lazy (Filec.read path),
+        lazy (Filec.type_of_path path) )
 
 let read_tree path = path |> to_tree |> sort_tree
 let file_at cursor = cursor.files.(cursor.pos)
@@ -99,7 +103,7 @@ let go_next zipper =
   | Dir_cursor cursor -> (
       let next = file_at cursor in
       match next with
-      | File (_name, contents) ->
+      | File (_name, contents, _) ->
           {
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);
