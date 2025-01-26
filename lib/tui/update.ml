@@ -4,7 +4,7 @@ let move_fs move_fn (code_tab : Model.code_tab) =
   let fs = move_fn code_tab.fs in
   { code_tab with fs }
 
-let move_issues move (issues_tab : Model.issues_tab) =
+let move_issues move (issues_tab : Model.Issue.t) =
   let len = issues_tab.issues |> Lazy.force |> List.length in
   let offset = (issues_tab.offset + move + len) mod len in
   { issues_tab with offset }
@@ -31,6 +31,16 @@ let move_next (model : Model.t) =
   | Code -> { model with code_tab = move_fs Fs.go_next model.code_tab }
   | Issues | PullRequests -> model
 
+let filter (filter : Model.Issue.filter) (model : Model.t) =
+  match model.current_tab with
+  | Code -> model
+  | Issues ->
+      {
+        model with
+        issues_tab = Model.Issue.apply_filter filter model.issues_tab;
+      }
+  | PullRequests -> model
+
 let update event (model : Model.t) =
   match event with
   (* if we press `q` or the escape key, we exit *)
@@ -44,5 +54,9 @@ let update event (model : Model.t) =
   | Down | Key "j" -> `Render (move_down model)
   | Left | Key "h" -> `Render (move_back model)
   | Right | Key "l" -> `Render (move_next model)
+  (* Issue/PR selection*)
+  | Key "o" -> `Render (filter Model.Issue.filter_open model)
+  | Key "c" -> `Render (filter Model.Issue.filter_closed model)
+  | Key "a" -> `Render (filter Model.Issue.filter_all model)
   (* otherwise, we do nothing *)
   | _ -> `Render model
