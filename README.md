@@ -10,7 +10,7 @@ A TUI interface to GitHub.
 > `github-tui` is in _pre-alpha_ stage of development!
 > Expect missing features, surprising behaviour, horrible bugs and breaking changes.
 >
-> **Completion**: Done 32%/100% 🌕🌕🌕🌘🌑🌑🌑🌑🌑🌑
+> **Completion**: Done 42%/100% 🌕🌕🌕🌕🌘🌑🌑🌑🌑🌑
 
 > [!IMPORTANT]
 > **DISCLAIMER:** `github-tui` is developed and maintained in free time
@@ -46,6 +46,11 @@ Run the project:
 ```
 dune exec bin/main.exe -- owner/repo
 ```
+
+> Example testing instructions:
+> ```
+> dune exec bin/main.exe -- chshersh/github-tui --directory=../github-tui
+> ```
 
 Install dev dependencies:
 
