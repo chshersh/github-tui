@@ -20,12 +20,7 @@ let shutdown terminal_io () =
   Tty.Escape_seq.show_cursor_seq ();
   Tty.Stdin.shutdown terminal_io
 
-let output_str str =
-  let bytes = String.to_bytes str in
-  let len = Bytes.length bytes in
-  let _ = Unix.write Unix.stdout bytes 0 len in
-  ()
-
+let output_str = output_string stdout
 let output_line str = output_str (str ^ "\n")
 
 let clear_of width =
