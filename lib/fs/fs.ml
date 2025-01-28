@@ -1,7 +1,7 @@
 module Filec = Filec
 
 type tree =
-  | File of string * Filec.t Lazy.t
+  | File of string * Filec.t Lazy.t * Filec.file_type Lazy.t
   | Dir of string * tree array Lazy.t
 
 type dir_cursor = {
@@ -15,7 +15,7 @@ type cursor =
 
 (* Extracts the file name from a tree node *)
 let file_name = function
-  | File (name, _) -> name
+  | File (name, _, _) -> name
   | Dir (name, _) -> name
 
 (* A files comparison:
@@ -30,7 +30,7 @@ let order_files t1 t2 =
   | _, _ -> String.compare (file_name t1) (file_name t2)
 
 let rec sort_tree = function
-  | File (name, contents) -> File (name, contents)
+  | File (name, contents, ft) -> File (name, contents, ft)
   | Dir (name, (lazy children)) ->
       Array.sort order_files children;
       Dir (name, lazy (Array.map sort_tree children))
@@ -46,7 +46,11 @@ let rec to_tree path =
     in
     let dirname = Filename.basename path in
     Dir (dirname, children)
-  else File (Filename.basename path, lazy (Filec.read path))
+  else
+    File
+      ( Filename.basename path,
+        lazy (Filec.read path),
+        lazy (Filec.type_of_path path) )
 
 let read_tree path = path |> to_tree |> sort_tree
 let file_at cursor = cursor.files.(cursor.pos)
@@ -75,13 +79,10 @@ let move_dir_cursor move cursor =
   { cursor with pos = new_pos }
 
 let move_file_cursor move cursor =
-  match cursor with
-  | Filec.Binary -> cursor
-  | Filec.Text txt_cur ->
-      let len = Filec.length cursor in
-      let new_offset = Filec.offset cursor + move in
-      if new_offset < 0 || new_offset + span > len then cursor
-      else Filec.Text { txt_cur with offset = new_offset }
+  let len = Filec.length cursor in
+  let new_offset = cursor.offset + move in
+  if new_offset < 0 || new_offset + span > len then cursor
+  else { cursor with offset = new_offset }
 
 let go_move move zipper =
   let move_dir = move_dir_cursor move in
@@ -99,7 +100,7 @@ let go_next zipper =
   | Dir_cursor cursor -> (
       let next = file_at cursor in
       match next with
-      | File (_name, contents) ->
+      | File (_name, contents, _) ->
           {
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);

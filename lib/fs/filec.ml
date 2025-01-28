@@ -1,21 +1,31 @@
-type t =
-  | Binary
-  | Text of {
-      lines : Pretty.Doc.t array;
-      offset : int;
-    }
+type t = {
+  lines : Pretty.Doc.t array;
+  offset : int;
+}
 
-(* Regex to used to determine if bat outputs a binary file warning. This is a
-   bit of a fragile approach, but there is no robust way to determine if a file
-   is binary or not. Improve this if it becomes a problem.
-*)
-let binary_file_pattern = Str.regexp ".*\\[bat warning\\].*Binary.*content*."
+type file_type =
+  | Binary
+  | Text
 
 let binary_file_warning =
   [| Pretty.Doc.str "This file is binary and cannot be displayed" |]
 
-let has_binary_warning contents =
-  Str.string_match binary_file_pattern contents 0
+let open_file_bin num_bytes path =
+  let buffer = Bytes.create num_bytes in
+  let n =
+    In_channel.with_open_bin path (fun ic -> input ic buffer 0 num_bytes)
+  in
+  Bytes.sub buffer 0 n
+
+let has_zero_bytes buffer =
+  let rec has_null = function
+    | i when i = Bytes.length buffer -> false
+    | i when Bytes.get buffer i = '\x00' -> true
+    | i -> has_null (i + 1)
+  in
+  has_null 0
+
+let is_likely_binary path = path |> open_file_bin 1024 |> has_zero_bytes
 
 let bat_cmd =
   {|bat --style=numbers,changes --color=always --italic-text=always --paging=never --terminal-width=80 |}
@@ -24,25 +34,19 @@ let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
 
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read path =
-  let contents = read_file_raw path in
-  if has_binary_warning contents then Binary
+  if is_likely_binary path then { lines = binary_file_warning; offset = 0 }
   else
     let lines =
-      contents
+      path
+      |> read_file_raw
       |> String.split_on_char '\n'
       |> List.map Pretty.Doc.str
       |> Array.of_list
     in
-    Text { lines; offset = 0 }
+    { lines; offset = 0 }
 
-let offset = function
-  | Text { offset; _ } -> offset
-  | Binary -> 0
-
-(* Returns the lines of the file contents *)
-let lines = function
-  | Text { lines; _ } -> lines
-  | Binary -> binary_file_warning
+(* Returns file type based on contents *)
+let type_of_path path = if is_likely_binary path then Binary else Text
 
 (* Returns the number of lines in the file contents *)
-let length filec = filec |> lines |> Array.length
+let length filec = filec.lines |> Array.length
