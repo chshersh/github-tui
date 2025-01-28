@@ -1,9 +1,11 @@
-type t =
+type t = {
+  lines : Pretty.Doc.t array;
+  offset : int;
+}
+
+type file_type =
   | Binary
-  | Text of {
-      lines : Pretty.Doc.t array;
-      offset : int;
-    }
+  | Text
 
 let binary_file_warning =
   [| Pretty.Doc.str "This file is binary and cannot be displayed" |]
@@ -32,7 +34,7 @@ let read_file_raw path = Shell.proc_stdout (bat_cmd ^ path)
 
 (* Reads file contents using 'bat' to have pretty syntax highlighting *)
 let read path =
-  if is_likely_binary path then Binary
+  if is_likely_binary path then { lines = binary_file_warning; offset = 0 }
   else
     let lines =
       path
@@ -41,25 +43,10 @@ let read path =
       |> List.map Pretty.Doc.str
       |> Array.of_list
     in
-    Text { lines; offset = 0 }
-
-type file_type =
-  | BinaryFile
-  | TextFile
+    { lines; offset = 0 }
 
 (* Returns file type based on contents *)
-let type_of_path path = if is_likely_binary path then BinaryFile else TextFile
-
-(* Returns offset based on file type of contents *)
-
-let offset = function
-  | Text { offset; _ } -> offset
-  | Binary -> 0
-
-(* Returns the lines of the file contents *)
-let lines = function
-  | Text { lines; _ } -> lines
-  | Binary -> binary_file_warning
+let type_of_path path = if is_likely_binary path then Binary else Text
 
 (* Returns the number of lines in the file contents *)
-let length filec = filec |> lines |> Array.length
+let length filec = filec.lines |> Array.length

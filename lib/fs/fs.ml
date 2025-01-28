@@ -79,13 +79,10 @@ let move_dir_cursor move cursor =
   { cursor with pos = new_pos }
 
 let move_file_cursor move cursor =
-  match cursor with
-  | Filec.Binary -> cursor
-  | Filec.Text txt_cur ->
-      let len = Filec.length cursor in
-      let new_offset = Filec.offset cursor + move in
-      if new_offset < 0 || new_offset + span > len then cursor
-      else Filec.Text { txt_cur with offset = new_offset }
+  let len = Filec.length cursor in
+  let new_offset = cursor.offset + move in
+  if new_offset < 0 || new_offset + span > len then cursor
+  else { cursor with offset = new_offset }
 
 let go_move move zipper =
   let move_dir = move_dir_cursor move in
