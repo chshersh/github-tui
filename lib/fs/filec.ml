@@ -12,9 +12,9 @@ let binary_file_warning =
 
 let open_file_bin num_bytes path =
   let buffer = Bytes.create num_bytes in
-  let ic = open_in_bin path in
-  let n = input ic buffer 0 num_bytes in
-  close_in ic;
+  let n =
+    In_channel.with_open_bin path (fun ic -> input ic buffer 0 num_bytes)
+  in
   Bytes.sub buffer 0 n
 
 let has_zero_bytes buffer =
