@@ -49,8 +49,12 @@ let get_terminal_dimensions () =
   | Some height, Some width ->
       if !size_warning && (height < min_height || width < min_width) then (
         Printf.printf
-          "⚠️ Terminal size is too small! Expected minimum size: %d x %d, but \
-           got: %d x %d.\n"
+          {|⚠️ Terminal size is too small! GitHub TUI works better on bigger terminals.
+          Expected size: %3d width x %3d height
+                But got: %3d width x %3d height
+      
+      Pass the --ignore-size-warning flag to run anyway.
+|}
           min_width min_height width height;
         exit 1);
       { height; width }
