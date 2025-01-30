@@ -5,23 +5,29 @@ let owner_repo_arg =
   Arg.(value & pos 0 string "NOT_SPECIFIED" & info [] ~docv:"OWNER/REPO" ~doc)
 
 let path_arg =
-  let doc = "Path to a local directory of a GitHub repository" in
+  let doc = "Path to a local directory of a GitHub repository." in
   Arg.(
     value
     & opt (some string) None
     & info [ "d"; "directory" ] ~docv:"DIRECTORY_PATH" ~doc)
 
 let log_arg =
-  let doc = "Log debug information to the given file" in
+  let doc = "Log debug information to the given file." in
   Arg.(
     value
     & opt (some string) None
     & info [ "l"; "log-to" ] ~docv:"LOG_PATH" ~doc)
 
-let run owner_repo local_path log_file =
-  Tui.start ~owner_repo ~local_path ~log_file
+let ignore_size_warning_arg =
+  let doc = "Ignore the minimum size warning." in
+  Arg.(value & flag & info [ "i"; "ignore-size-warning" ] ~doc)
 
-let gh_tui_term = Term.(const run $ owner_repo_arg $ path_arg $ log_arg)
+let run owner_repo local_path log_file ignore_size_warning =
+  Tui.start ~owner_repo ~local_path ~log_file ~ignore_size_warning
+
+let gh_tui_term =
+  Term.(
+    const run $ owner_repo_arg $ path_arg $ log_arg $ ignore_size_warning_arg)
 
 let cmd =
   let doc = "TUI of a GitHub repository" in

@@ -41,20 +41,36 @@ type terminal = {
   width : int;
 }
 
-let get_terminal_dimensions () =
-  let height = Option.value (Terminal_size.get_rows ()) ~default:40 in
-  let width = Option.value (Terminal_size.get_columns ()) ~default:140 in
-  { height; width }
+let min_height, min_width = (40, 140)
 
-let init ~owner_repo ~local_path : Model.initial_data =
+let get_terminal_dimensions ignore_size_warning =
+  match (Terminal_size.get_rows (), Terminal_size.get_columns ()) with
+  | Some height, Some width ->
+      if (not ignore_size_warning) && (height < min_height || width < min_width)
+      then (
+        Printf.printf
+          {|⚠️ Terminal size is too small! GitHub TUI works better on bigger terminals.
+          Expected size: %3d width x %3d height
+                But got: %3d width x %3d height
+      
+      Pass the --ignore-size-warning flag to run anyway.
+|}
+          min_width min_height width height;
+        exit 1);
+      { height; width }
+  | _ ->
+      Printf.printf "⚠️ Not able to get the terminal size.\n";
+      exit 1
+
+let init ~owner_repo ~local_path ~ignore_size_warning : Model.initial_data =
   let ({ owner; repo } as owner_repo) = parse_owner_repo owner_repo in
   let root_dir_path = clone_repo ~owner_repo ~local_path in
   let files = Lazy.force (read_root_tree ~root_dir_path) in
-  let { height; width } = get_terminal_dimensions () in
+  let { height; width } = get_terminal_dimensions ignore_size_warning in
   { owner; repo; root_dir_path; files; width; height }
 
-let start ~owner_repo ~local_path ~log_file =
-  let initial_data = init ~owner_repo ~local_path in
+let start ~owner_repo ~local_path ~log_file ~ignore_size_warning =
+  let initial_data = init ~owner_repo ~local_path ~ignore_size_warning in
   let init = Model.initial_model initial_data in
   let app = Tea.make ~init ~update:Update.update ~view:View.view in
   Tea.run ?path:log_file app
