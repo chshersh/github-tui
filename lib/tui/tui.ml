@@ -45,15 +45,18 @@ let min_height, min_width = (40, 140)
 let size_warning = ref true
 
 let get_terminal_dimensions () =
-  let height = Option.value (Terminal_size.get_rows ()) ~default:min_height in
-  let width = Option.value (Terminal_size.get_columns ()) ~default:min_width in
-  if !size_warning && (height < min_height || width < min_width) then (
-    Printf.printf
-      "⚠️ Terminal size is too small! Expected minimum size: %d x %d, but got: \
-       %d x %d.\n"
-      min_width min_height width height;
-    exit 1);
-  { height; width }
+  match (Terminal_size.get_rows (), Terminal_size.get_columns ()) with
+  | Some height, Some width ->
+      if !size_warning && (height < min_height || width < min_width) then (
+        Printf.printf
+          "⚠️ Terminal size is too small! Expected minimum size: %d x %d, but \
+           got: %d x %d.\n"
+          min_width min_height width height;
+        exit 1);
+      { height; width }
+  | _ ->
+      Printf.printf "⚠️ Not able to get the terminal size.\n";
+      exit 1
 
 let init ~owner_repo ~local_path : Model.initial_data =
   let ({ owner; repo } as owner_repo) = parse_owner_repo owner_repo in
