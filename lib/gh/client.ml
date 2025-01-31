@@ -1,6 +1,11 @@
 module Json = Yojson.Basic.Util
 
-type error = No_github_token
+type error =
+  | No_github_token
+  | Curl_error of {
+      code : int;
+      msg : string;
+    }
 
 let github_api_url = "https://api.github.com/graphql"
 
@@ -19,7 +24,7 @@ let query query_body =
           ~url:github_api_url ()
       in
       match response with
-      | Error (_code, msg) -> Ok (Printf.sprintf "Error: %s" msg)
+      | Error (code, msg) -> Error (Curl_error { code = Curl.errno code; msg })
       | Ok response -> Ok response.body)
 
 let parse_response (path : string list) (parse_item : Yojson.Basic.t -> 'a) json

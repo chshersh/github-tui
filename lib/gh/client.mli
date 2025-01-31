@@ -24,7 +24,12 @@
       |}
     ]} *)
 
-type error = No_github_token
+type error =
+  | No_github_token
+  | Curl_error of {
+      code : int;
+      msg : string;
+    }
 
 val query : string -> (string, error) result
 
