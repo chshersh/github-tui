@@ -76,4 +76,5 @@ let json_path = [ "data"; "repository"; "pullRequests"; "nodes" ]
 let pull_requests ~owner ~repo =
   mk_pr_query ~owner ~repo
   |> Client.query
-  |> Client.parse_response json_path parse_pr
+  |> Result.map (fun response ->
+         Client.parse_response json_path parse_pr response)

@@ -16,4 +16,4 @@ and state =
   | Open
 
 (** Query all open issues *)
-val issues : owner:string -> repo:string -> t list
+val issues : owner:string -> repo:string -> (t list, Client.error) result

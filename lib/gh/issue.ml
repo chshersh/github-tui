@@ -123,4 +123,5 @@ let issue_json_path = [ "data"; "repository"; "issues"; "nodes" ]
 let issues ~owner ~repo =
   mk_issues_query ~owner ~repo
   |> Client.query
-  |> Client.parse_response issue_json_path parse_issue
+  |> Result.map (fun response ->
+         Client.parse_response issue_json_path parse_issue response)

@@ -11,4 +11,4 @@ type t = {
 }
 
 (** Query all open pull requests *)
-val pull_requests : owner:string -> repo:string -> t list
+val pull_requests : owner:string -> repo:string -> (t list, Client.error) result

@@ -11,6 +11,7 @@ type t = {
   filter : filter;
   issues : Gh.Issue.t list Lazy.t;
   offset : int;
+  error : Gh.Client.error option;
 }
 
 and filter =
