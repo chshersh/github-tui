@@ -33,8 +33,14 @@ let section (tab : Model.Pr.t) =
              your environment.";
           str "";
           str
-            "If you don't have a token, visit thefollowing page to create one:";
+            "If you don't have a token, visit the following page to create one:";
           str "  • https://github.com/settings/tokens";
+        ]
+    | Some (Curl_error { code; msg }) ->
+        [
+          Format.sprintf "\u{26A0} Github returned error code %d: " code |> str;
+          str "";
+          str msg;
         ]
   in
   vertical docs
