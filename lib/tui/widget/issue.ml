@@ -84,9 +84,25 @@ let fmt_issues ~selected issues =
   issues |> Lazy.force |> List.map fmt_issue |> Generic.vlist_border ~selected
 
 let section (issues_tab : Model.Issue.t) =
-  let issues =
+  let docs =
     match issues_tab.error with
-    | None -> fmt_issues ~selected:issues_tab.offset issues_tab.issues
-    | Some No_github_token -> Doc.str "\u{26A0} GITHUB_TOKEN not found"
+    | None ->
+        [
+          fmt_filters issues_tab.filter;
+          Doc.str "";
+          fmt_issues ~selected:issues_tab.offset issues_tab.issues;
+        ]
+    | Some No_github_token ->
+        Doc.
+          [
+            str
+              "\u{26A0} GITHUB_TOKEN not found. Make sure it's configured in \
+               your environment.";
+            str "";
+            str
+              "If you don't have a token, visit thefollowing page to create \
+               one:";
+            str "  • https://github.com/settings/tokens";
+          ]
   in
-  Doc.(vertical [ fmt_filters issues_tab.filter; str ""; issues ])
+  Doc.vertical docs

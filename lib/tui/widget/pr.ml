@@ -4,7 +4,7 @@ let merged_char = "\u{e725}"
 
 let section (tab : Model.Pr.t) =
   let open Pretty.Doc in
-  let formatted_pr =
+  let docs =
     match tab.error with
     | None ->
         let fmt_state = function
@@ -27,6 +27,14 @@ let section (tab : Model.Pr.t) =
         in
         tab.pull_requests |> Lazy.force |> List.map fmt_pr
     | Some No_github_token ->
-        [ horizontal [ str " "; str "\u{26A0} GITHUB_TOKEN not found" ] ]
+        [
+          str
+            "\u{26A0} GITHUB_TOKEN not found. Make sure it's configured in \
+             your environment.";
+          str "";
+          str
+            "If you don't have a token, visit thefollowing page to create one:";
+          str "  • https://github.com/settings/tokens";
+        ]
   in
-  Pretty.Doc.vertical formatted_pr
+  vertical docs
