@@ -23,7 +23,10 @@
       }
       |}
     ]} *)
-val query : string -> string
+
+type error = No_github_token
+
+val query : string -> (string, error) result
 
 (** Parse the response from the above query **)
 val parse_response : string list -> (Yojson.Basic.t -> 'a) -> string -> 'a list

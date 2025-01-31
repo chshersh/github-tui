@@ -6,7 +6,9 @@ let move_fs move_fn (code_tab : Model.code_tab) =
 
 let move_issues move (issues_tab : Model.Issue.t) =
   let len = issues_tab.issues |> Lazy.force |> List.length in
-  let offset = (issues_tab.offset + move + len) mod len in
+  let offset =
+    (issues_tab.offset + move + len) mod if len = 0 then 1 else len
+  in
   { issues_tab with offset }
 
 let move_up (model : Model.t) =
