@@ -16,4 +16,4 @@ module Color = Color
 (** Render a document into the final string
 
     All notes from {!Doc.render} apply. *)
-val render : width:int -> Doc.t -> string
+val render : width:int -> height:int -> Doc.t -> string

@@ -17,6 +17,13 @@ val horizontal : t list -> t
     separator. *)
 val vertical : t list -> t
 
+(** A combinator that gives access to the current environment. Specifically, it
+    allows to render the document based on the current width and height.
+
+    Useful for elements that want to know how much of remaining width and height
+    got left. *)
+val with_size : (width:int -> height:int -> t) -> t
+
 (** [horizontal_fill filler] fills all the empty horizontal space with the given
     string [filler]. Useful for alignment or separators.
 
@@ -30,4 +37,4 @@ val horizontal_fill : string -> t
 
     * [width]: the max allowed width for the document. Passed recursively and
     currently only used for [horizontal_fill]. *)
-val render : width:int -> t -> Layout.t
+val render : width:int -> height:int -> t -> Layout.t
