@@ -42,4 +42,5 @@ let to_doc (model : Model.t) =
       empty;
     ]
 
-let view (model : Model.t) = model |> to_doc |> Pretty.render ~width:model.width
+let view (model : Model.t) =
+  model |> to_doc |> Pretty.render ~width:model.width ~height:model.height

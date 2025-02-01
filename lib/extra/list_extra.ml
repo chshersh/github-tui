@@ -15,3 +15,12 @@ let of_sub_array ~offset ~len arr =
   loop 0
 
 let max_on f list = List.fold_left (fun acc x -> max acc (f x)) 0 list
+
+let map_with_fold ~f ~init =
+  let[@tail_mod_cons] rec go acc = function
+    | [] -> []
+    | hd :: tl ->
+        let b, acc = f hd acc in
+        b :: go acc tl
+  in
+  go init
