@@ -5,12 +5,14 @@ type t =
   | Horizontal_fill of string
   | Vertical of t list
   | Horizontal of t list
+  | With_size of (width:int -> height:int -> t)
 
 let str string = Str ([], string)
 let fmt styles string = Str (styles, string)
 let horizontal cols = Horizontal cols
 let vertical rows = Vertical rows
 let horizontal_fill filler = Horizontal_fill filler
+let with_size f = With_size f
 
 type prerender =
   | Rendered of Layout.t
@@ -23,6 +25,7 @@ let rec render ~width ~height = function
   | Horizontal_fill filler -> horizontal_fill_to_layout ~width filler
   | Vertical rows -> vertical_to_layout ~width ~height rows
   | Horizontal cols -> horizontal_to_layout ~width ~height cols
+  | With_size f -> render ~width ~height (f ~width ~height)
 
 and horizontal_fill_to_layout ~width filler =
   filler |> Extra.String.repeat_txt width |> Layout.str
