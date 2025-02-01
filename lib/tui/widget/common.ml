@@ -12,7 +12,7 @@ let fmt_error (error : Gh.Client.error) =
       ]
   | Curl_error { code; msg } ->
       [
-        str (Format.sprintf "\u{26A0} Github returned error code %d: " code);
+        str (Format.sprintf "\u{26A0} GitHub API returned error code %d: " code);
         str "";
         str msg;
       ]
