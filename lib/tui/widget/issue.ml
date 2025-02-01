@@ -92,25 +92,6 @@ let section (issues_tab : Model.Issue.t) =
           Doc.str "";
           fmt_issues ~selected:issues_tab.offset issues_tab.issues;
         ]
-    | Some No_github_token ->
-        Doc.
-          [
-            str
-              "\u{26A0} GITHUB_TOKEN not found. Make sure it's configured in \
-               your environment.";
-            str "";
-            str
-              "If you don't have a token, visit the following page to create \
-               one:";
-            str "  • https://github.com/settings/tokens";
-          ]
-    | Some (Curl_error { code; msg }) ->
-        Doc.
-          [
-            Format.sprintf "\u{26A0} Github returned error code %d: " code
-            |> str;
-            str "";
-            str msg;
-          ]
+    | Some error -> Common.fmt_error error
   in
   Doc.vertical docs
