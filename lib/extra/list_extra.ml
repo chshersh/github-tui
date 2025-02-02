@@ -19,11 +19,10 @@ let map_with_fold ~f ~init =
   go init
 
 let map_with_fold_acc ~f ~init =
-  let[@tail_mod_cons] rec go acc = function
-    | [] -> ([], acc)
+  let[@tail_mod_cons] rec go acc rev_result = function
+    | [] -> (List.rev rev_result, acc)
     | hd :: tl ->
         let b, acc = f hd acc in
-        let rest, acc = go acc tl in
-        (b :: rest, acc)
+        go acc (b :: rev_result) tl
   in
-  go init
+  go init []
