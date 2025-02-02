@@ -10,14 +10,15 @@ val in_between : sep:'a -> 'a list -> 'a list
     Useful to calculate the longest string a list. *)
 val max_on : ('a -> int) -> 'a list -> int
 
-(** [map_with_fold ~f ~init l] folds and maps simultaneously. This function
-    folds the list with [f] where [f] takes the current element of the list,
+(** [map_and_fold ~f ~init l] folds and maps simultaneously. This function folds
+    the list with [f] where [f] takes the current element of the list,
     accumulator and returns a new element of the list of possibly updated
-    accumulator. *)
+    accumulator. The transormed list and the final value of the accumulator are
+    return. *)
+val map_and_fold :
+  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc
+
+(** [map_with_fold ~f ~init l] is just like [map_and_fold ~f ~init] except the
+    final value of the accumulator is not returned. *)
 val map_with_fold :
   f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list
-
-(** [map_with_fold_acc ~f ~init l] is just like [map_with_fold ~f ~init l] but
-    it returns the final value of the accumulator as well. *)
-val map_with_fold_acc :
-  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc

@@ -50,7 +50,7 @@ and horizontal_to_layout ~width ~height cols =
         (Rendered layout, size_taken + Layout.width layout)
   in
   let prerendered, size_taken =
-    Extra.List.map_with_fold_acc ~f:prerender ~init:0 cols
+    Extra.List.map_and_fold ~f:prerender ~init:0 cols
   in
 
   (* Step [fill_size]. Calculate the size of remaining fill *)
