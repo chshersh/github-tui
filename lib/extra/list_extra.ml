@@ -17,3 +17,13 @@ let map_with_fold ~f ~init =
         b :: go acc tl
   in
   go init
+
+let map_with_fold_acc ~f ~init =
+  let[@tail_mod_cons] rec go acc = function
+    | [] -> ([], acc)
+    | hd :: tl ->
+        let b, acc = f hd acc in
+        let rest, acc = go acc tl in
+        (b :: rest, acc)
+  in
+  go init
