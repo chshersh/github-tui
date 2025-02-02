@@ -21,5 +21,4 @@ let map_and_fold ~f ~init lst =
   let res = go lst in
   (res, !acc_ref)
 
-let map_with_fold ~f ~init lst =
-  map_and_fold ~f ~init lst |> fst
+let map_with_fold ~f ~init lst = map_and_fold ~f ~init lst |> fst

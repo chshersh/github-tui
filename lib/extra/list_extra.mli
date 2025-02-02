@@ -16,8 +16,9 @@ val max_on : ('a -> int) -> 'a list -> int
     accumulator. The transormed list and the final value of the accumulator are
     returned. *)
 val map_and_fold :
-  f:('a -> 'acc-> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc
+  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc
 
 (** [map_with_fold ~f ~init l] is just like [map_and_fold ~f ~init], except that
     it does not return the final value of the accumulator. *)
-val map_with_fold : f:('a -> 'acc-> 'b * 'acc) -> init:'acc-> 'a list -> 'b list
+val map_with_fold :
+  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list
