@@ -22,5 +22,4 @@ let map_and_fold ~f ~init lst =
   (res, !acc_ref)
 
 let map_with_fold ~f ~init lst =
-  let res, _ = map_and_fold ~f ~init lst in
-  res
+  map_and_fold ~f ~init lst |> fst
