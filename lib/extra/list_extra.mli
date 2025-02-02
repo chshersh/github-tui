@@ -4,10 +4,6 @@
     Doesn't insert [sep] when the given list has size 0 or 1. *)
 val in_between : sep:'a -> 'a list -> 'a list
 
-(** [of_sub_array ~offset ~len arr] returns a list of elements from [arr]
-    starting from [offset] with length no more than [len]. *)
-val of_sub_array : offset:int -> len:int -> 'a array -> 'a list
-
 (** [max_on to_int l] applies [to_int] to every element of the list and returns
     the maximum value.
 

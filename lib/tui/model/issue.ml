@@ -32,9 +32,12 @@ let lazy_filter_issues ~filter issues =
 let issues_length issues = issues |> Lazy.force |> Array.length
 
 let apply_filter filter t =
-  let issues = lazy_filter_issues ~filter t.all_issues in
-  let offset = min t.offset (issues |> issues_length |> fun l -> l - 1) in
-  { t with filter; issues; offset }
+  if filter = t.filter then t
+  else
+    let issues = lazy_filter_issues ~filter t.all_issues in
+    let offset = 0 in
+    let scroll_start = 0 in
+    { t with filter; issues; offset; scroll_start }
 
 let make ~owner ~repo =
   let issues_and_errors =
@@ -53,7 +56,6 @@ let make ~owner ~repo =
   let scroll_start = 0 in
   { all_issues; filter; issues; offset; scroll_start; error }
 
-(* Hardcoded number of maximum issues to display per scroll. *)
 let max_issues = 10
 
 let move direction tab =
@@ -65,7 +67,7 @@ let move direction tab =
     else offset
   in
   let scroll_start =
-    if tab.scroll_start < offset then offset
+    if tab.scroll_start > offset then offset
     else if tab.scroll_start + max_issues <= offset then
       tab.scroll_start + direction
     else tab.scroll_start

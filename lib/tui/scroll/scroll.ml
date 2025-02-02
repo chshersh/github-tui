@@ -26,3 +26,10 @@ let to_sections { height; span; lines; offset } =
     let scroll = span * height / lines in
     let after = height - before - scroll in
     { before; scroll; after }
+
+let render { before; scroll; after } =
+  let before = List.init before (fun _ -> Pretty.Doc.str "░") in
+  let scroll = List.init scroll (fun _ -> Pretty.Doc.str "█") in
+  let after = List.init after (fun _ -> Pretty.Doc.str "░") in
+  let scroll_bar = before @ scroll @ after in
+  Pretty.Doc.vertical scroll_bar

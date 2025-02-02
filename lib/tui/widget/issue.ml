@@ -40,8 +40,7 @@ let fmt_filters current_filter =
 let fmt_issues ~selected issues =
   issues
   |> Lazy.force
-  |> Array.to_list
-  |> List.map (fun (rendered : _ Render.t) -> rendered.layout)
+  |> Array.map (fun (rendered : _ Render.t) -> rendered.layout)
   |> Generic.vlist_border ~selected
 
 let section (issues_tab : Model.Issue.t) =
@@ -51,7 +50,8 @@ let section (issues_tab : Model.Issue.t) =
         [
           fmt_filters issues_tab.filter;
           Doc.str "";
-          fmt_issues ~selected:issues_tab.offset issues_tab.issues;
+          fmt_issues ~scroll_start:issues_tab.scroll_start
+            ~selected:issues_tab.offset issues_tab.issues;
         ]
     | Some error -> Common.fmt_error error
   in

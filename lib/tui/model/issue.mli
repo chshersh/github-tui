@@ -32,3 +32,9 @@ val apply_filter : filter -> t -> t
     Moves [offset] while also moving [scroll_start] if [offset] is out of
     boundaries. *)
 val move : int -> t -> t
+
+(** Total number of issues to display per scroll span.
+
+    Ideally, this constant should be dynamically calculated based on available
+    height. For simplicity, hardcoding for now. *)
+val max_issues : int
