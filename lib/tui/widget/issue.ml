@@ -40,6 +40,7 @@ let fmt_filters current_filter =
 let fmt_issues ~selected issues =
   issues
   |> Lazy.force
+  |> Array.to_list
   |> List.map (fun (rendered : _ Render.t) -> rendered.layout)
   |> Generic.vlist_border ~selected
 

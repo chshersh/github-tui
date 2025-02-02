@@ -9,8 +9,9 @@
 type t = {
   all_issues : Gh.Issue.t Render.t list Lazy.t;
   filter : filter;
-  issues : Gh.Issue.t Render.t list Lazy.t;
+  issues : Gh.Issue.t Render.t array Lazy.t;
   offset : int;
+  scroll_start : int;
   error : Gh.Client.error option Lazy.t;
 }
 
@@ -25,3 +26,9 @@ val make : owner:string -> repo:string -> t
 
 (** Change the filter to a new one and update currently selected issues. *)
 val apply_filter : filter -> t -> t
+
+(** Usage: [move 1 tab] or [move (-1) tab]:
+
+    Moves [offset] while also moving [scroll_start] if [offset] is out of
+    boundaries. *)
+val move : int -> t -> t
