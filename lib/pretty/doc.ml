@@ -32,7 +32,7 @@ and horizontal_fill_to_layout ~width filler =
 
 and vertical_to_layout ~width ~height rows =
   let render_row row height =
-    (* While traversing vertically, width doesn't change but the heigh decreases. *)
+    (* While traversing vertically, width doesn't change but the height decreases. *)
     let row_layout = render ~width ~height row in
     let remaining_height = height - Layout.height row_layout in
     (row_layout, remaining_height)
