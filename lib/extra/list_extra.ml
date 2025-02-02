@@ -9,14 +9,17 @@ let in_between ~sep list =
 
 let max_on f list = List.fold_left (fun acc x -> max acc (f x)) 0 list
 
-let map_and_fold ~f ~init =
-  let[@tail_mod_cons] rec go acc rev_result = function
-    | [] -> (List.rev rev_result, acc)
+let map_and_fold ~f ~init lst =
+  let acc_ref = ref init in
+  let[@tail_mod_cons] rec go = function
+    | [] -> []
     | hd :: tl ->
-        let b, acc = f hd acc in
-        go acc (b :: rev_result) tl
+        let b, new_acc = f hd !acc_ref in
+        acc_ref := new_acc;
+        b :: go tl
   in
-  go init []
+  let res = go lst in
+  (res, !acc_ref)
 
 let map_with_fold ~f ~init lst =
   let res, _ = map_and_fold ~f ~init lst in

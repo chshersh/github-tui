@@ -12,13 +12,12 @@ val max_on : ('a -> int) -> 'a list -> int
 
 (** [map_and_fold ~f ~init l] folds and maps simultaneously. This function folds
     the list with [f] where [f] takes the current element of the list,
-    accumulator and returns a new element of the list of possibly updated
+    accumulator and returns a new element of the list and the possibly updated
     accumulator. The transormed list and the final value of the accumulator are
-    return. *)
+    returned. *)
 val map_and_fold :
-  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc
+  f:('a -> int -> 'b * int) -> init:int -> 'a list -> 'b list * int
 
-(** [map_with_fold ~f ~init l] is just like [map_and_fold ~f ~init] except the
-    final value of the accumulator is not returned. *)
-val map_with_fold :
-  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list
+(** [map_with_fold ~f ~init l] is just like [map_and_fold ~f ~init], except that
+    it does not return the final value of the accumulator. *)
+val map_with_fold : f:('a -> int -> 'b * int) -> init:int -> 'a list -> 'b list
