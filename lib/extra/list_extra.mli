@@ -17,7 +17,7 @@ val max_on : ('a -> int) -> 'a list -> int
 val map_with_fold :
   f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list
 
-(** [map_with_fold_acc ~f ~init l] is just like [map_with_fold_acc ~f ~init l]
+(** [map_with_fold_acc ~f ~init l] is just like [map_with_fold ~f ~init l]
     but it returns the final value of the accumulator as well. *)
 val map_with_fold_acc :
   f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc
