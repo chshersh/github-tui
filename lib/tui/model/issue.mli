@@ -7,11 +7,11 @@
     - [issues]: Filtered issues from [all_issues] using [filter]
     - [offset]: Offset for currently selected issue from [issues] *)
 type t = {
-  all_issues : Gh.Issue.t list Lazy.t;
+  all_issues : Gh.Issue.t Render.t list Lazy.t;
   filter : filter;
-  issues : Gh.Issue.t list Lazy.t;
+  issues : Gh.Issue.t Render.t list Lazy.t;
   offset : int;
-  error : Gh.Client.error option;
+  error : Gh.Client.error option Lazy.t;
 }
 
 and filter =

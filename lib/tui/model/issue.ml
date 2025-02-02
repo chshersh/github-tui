@@ -1,9 +1,9 @@
 type t = {
-  all_issues : Gh.Issue.t list Lazy.t;
+  all_issues : Gh.Issue.t Render.t list Lazy.t;
   filter : filter;
-  issues : Gh.Issue.t list Lazy.t;
+  issues : Gh.Issue.t Render.t list Lazy.t;
   offset : int;
-  error : Gh.Client.error option;
+  error : Gh.Client.error option Lazy.t;
 }
 
 and filter =
@@ -18,7 +18,9 @@ let filter_issues ~filter issues =
   match filter with
   | All -> issues
   | State state ->
-      issues |> List.filter (fun (issue : Gh.Issue.t) -> issue.state = state)
+      issues
+      |> List.filter (fun (issue : Gh.Issue.t Render.t) ->
+             issue.item.state = state)
 
 let lazy_filter_issues ~filter issues =
   lazy (issues |> Lazy.force |> filter_issues ~filter)
@@ -31,11 +33,16 @@ let apply_filter filter t =
   { t with filter; issues; offset }
 
 let make ~owner ~repo =
-  let all_issues, error =
-    match Gh.Issue.issues ~owner ~repo with
-    | Ok issues -> (lazy issues, None)
-    | Error err -> (lazy [], Some err)
+  let issues_and_errors =
+    lazy
+      (match Gh.Issue.issues ~owner ~repo with
+      | Ok issues ->
+          let rendered = Render.issues issues in
+          (rendered, None)
+      | Error err -> ([], Some err))
   in
+  let all_issues = lazy (issues_and_errors |> Lazy.force |> fst) in
+  let error = lazy (issues_and_errors |> Lazy.force |> snd) in
   let filter = filter_open in
   let issues = lazy_filter_issues ~filter all_issues in
   let offset = 0 in

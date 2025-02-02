@@ -1,6 +1,6 @@
 (** This module contains generic widgets. *)
 
-(** Created a vertical list of items inside border like this one:
+(** Creates a vertical list of items inside border like this one:
 
     {v
 ╭────────╮
@@ -15,6 +15,8 @@
     v}
 
     Additionally, highlights the border of the selected item.
+
+    Also adds a scrollbar if items don't fit on the screen.
 
     This function takes values of type {!Pretty.Layout.t}, so it could
     efficiently calculate the size of element per line. *)

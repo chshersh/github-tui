@@ -25,7 +25,6 @@ let item_padding = 4
 
 let vlist_border ~selected items =
   let max_item_width = Extra.List.max_on Layout.width items in
-  let pad = Extra.String.fill_right max_item_width in
   let max_width = max_item_width + item_padding in
 
   (* Frame *)
@@ -42,9 +41,7 @@ let vlist_border ~selected items =
     Doc.(
       horizontal [ fmt Style.selected "│ "; str line; fmt Style.selected " │" ])
   in
-  let to_lines_item item =
-    item |> Layout.to_lines |> List.map pad |> of_lines
-  in
+  let to_lines_item item = item |> Layout.to_lines |> of_lines in
 
   let render_item { is_selected; item_type } =
     match item_type with
