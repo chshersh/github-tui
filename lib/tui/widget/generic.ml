@@ -22,6 +22,7 @@ let of_lines lines = { is_selected = false; item_type = Lines lines }
    * 1: Unicode box character (right)
 *)
 let item_padding = 4
+let arrow_left_char = "\u{f0a8}"
 
 let vlist_border ~selected items =
   let max_item_width = Extra.List.max_on Layout.width items in
@@ -36,19 +37,29 @@ let vlist_border ~selected items =
   let highlight_index = (2 * selected) + 1 in
 
   (* Line *)
+  let to_lines_item item = item |> Layout.to_lines |> of_lines in
   let fmt_line line = Doc.str ("│ " ^ line ^ " │") in
   let fmt_selected_line line =
     Doc.(
       horizontal [ fmt Style.selected "│ "; str line; fmt Style.selected " │" ])
   in
-  let to_lines_item item = item |> Layout.to_lines |> of_lines in
+  let fmt_selected_lines = function
+    | [] -> []
+    | hd :: tl ->
+        let first_line =
+          Doc.(
+            horizontal [ fmt_selected_line hd; str " "; str arrow_left_char ])
+        in
+        let other_lines = List.map fmt_selected_line tl in
+        first_line :: other_lines
+  in
 
   let render_item { is_selected; item_type } =
     match item_type with
     | Separator sep ->
         if is_selected then Doc.[ fmt Style.selected sep ] else Doc.[ str sep ]
     | Lines lines ->
-        if is_selected then List.map fmt_selected_line lines
+        if is_selected then fmt_selected_lines lines
         else List.map fmt_line lines
   in
 

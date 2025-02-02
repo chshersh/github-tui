@@ -54,11 +54,9 @@ let issues issue_list =
   ListLabels.map2 issue_list layouts ~f:(fun issue layout ->
       let width = Layout.width layout in
       let padding_len = max_issue_width - width in
+      let padding = Layout.str (Extra.String.repeat_txt padding_len " ") in
+      (* NOTE: Two [padding] elements assume an issue renders into two lines *)
       let layout =
-        if padding_len <= 0 then layout
-        else
-          let padding = Layout.str (Extra.String.repeat_txt padding_len " ") in
-          (* NOTE: Two [padding] elements assume an issue renders into two lines *)
-          Layout.(horizontal [ layout; vertical [ padding; padding ] ])
+        Layout.(horizontal [ layout; vertical [ padding; padding ] ])
       in
       { item = issue; layout })
