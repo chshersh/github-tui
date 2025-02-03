@@ -7,7 +7,7 @@ let parse_owner_repo owner_repo =
   match String.split_on_char '/' owner_repo with
   | [ owner; repo ] -> { owner; repo }
   | _ ->
-      Printf.printf "❌ Expected <owner>/<repo> but got: '%s'\n" owner_repo;
+      Printf.eprintf "❌ Expected <owner>/<repo> but got: '%s'\n" owner_repo;
       exit 1
 
 let clone_repo ~owner_repo ~local_path =
@@ -30,7 +30,7 @@ let read_root_tree ~root_dir_path =
   let files =
     match tree with
     | Fs.File (path, _, _) ->
-        Printf.printf "Given path '%s' is not a directory!" path;
+        Printf.eprintf "Given path '%s' is not a directory!" path;
         exit 1
     | Fs.Dir (_, files) -> files
   in
@@ -48,7 +48,7 @@ let get_terminal_dimensions ignore_size_warning =
   | Some height, Some width ->
       if (not ignore_size_warning) && (height < min_height || width < min_width)
       then (
-        Printf.printf
+        Printf.eprintf
           {|⚠️ Terminal size is too small! GitHub TUI works better on bigger terminals.
           Expected size: %3d width x %3d height
                 But got: %3d width x %3d height
@@ -59,7 +59,7 @@ let get_terminal_dimensions ignore_size_warning =
         exit 1);
       { height; width }
   | _ ->
-      Printf.printf "⚠️ Not able to get the terminal size.\n";
+      Printf.eprintf "⚠️ Not able to get the terminal size.\n";
       exit 1
 
 let init ~owner_repo ~local_path ~ignore_size_warning : Model.initial_data =
