@@ -26,12 +26,14 @@
 
 type error =
   | No_github_token
+  | Bad_credentials
   | Curl_error of {
       code : int;
       msg : string;
     }
 
-val query : string -> (string, error) result
+val query : string -> (Yojson.Basic.t, error) result
 
 (** Parse the response from the above query **)
-val parse_response : string list -> (Yojson.Basic.t -> 'a) -> string -> 'a list
+val parse_response :
+  string list -> (Yojson.Basic.t -> 'a) -> Yojson.Basic.t -> 'a list
