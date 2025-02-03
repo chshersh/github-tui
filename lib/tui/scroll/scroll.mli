@@ -18,3 +18,6 @@ type sections = {
 val make : height:int -> span:int -> lines:int -> offset:int -> t option
 
 val to_sections : t -> sections
+
+(** Renders a scrollbar from [sections]. *)
+val render : sections -> Pretty.Doc.t

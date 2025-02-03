@@ -26,7 +26,7 @@ let append line1 line2 =
 let fmt line = line.chunks |> List.map Chunk.fmt |> String.concat ""
 
 let zip_lines l r =
-  let max_len_l = List.map length l |> List.fold_left max 0 in
+  let max_len_l = Extra.List.max_on length l in
 
   let rec zip l r =
     match (l, r) with
