@@ -3,13 +3,7 @@ let scroll ~lines ~span ~offset =
   let scroll = Scroll.make ~height ~span ~lines ~offset in
   match scroll with
   | None -> Pretty.Doc.str " "
-  | Some scroll ->
-      let sections = Scroll.to_sections scroll in
-      let before = List.init sections.before (fun _ -> Pretty.Doc.str "░") in
-      let scroll = List.init sections.scroll (fun _ -> Pretty.Doc.str "█") in
-      let after = List.init sections.after (fun _ -> Pretty.Doc.str "░") in
-      let scroll_bar = before @ scroll @ after in
-      Pretty.Doc.vertical scroll_bar
+  | Some scroll -> scroll |> Scroll.to_sections |> Scroll.render
 
 let pwd_char = "\u{e5fd}"
 let dir_char = "\u{f4d4}"
@@ -33,7 +27,7 @@ let file_contents_to_doc ~(file_contents : Fs.Filec.t) =
   let span = 40 in
   let offset = file_contents.offset in
 
-  let contents_span = Extra.List.of_sub_array ~offset ~len:span lines in
+  let contents_span = Extra.Array.of_sub_array ~offset ~len:span lines in
 
   let scroll_doc = scroll ~lines:len_lines ~span ~offset in
   let contents_doc = Pretty.Doc.vertical contents_span in

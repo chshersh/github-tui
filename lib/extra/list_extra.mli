@@ -4,19 +4,21 @@
     Doesn't insert [sep] when the given list has size 0 or 1. *)
 val in_between : sep:'a -> 'a list -> 'a list
 
-(** [of_sub_array ~offset ~len arr] returns a list of elements from [arr]
-    starting from [offset] with length no more than [len]. *)
-val of_sub_array : offset:int -> len:int -> 'a array -> 'a list
-
 (** [max_on to_int l] applies [to_int] to every element of the list and returns
     the maximum value.
 
     Useful to calculate the longest string a list. *)
 val max_on : ('a -> int) -> 'a list -> int
 
-(** [map_with_fold ~f ~init l] folds and maps simultaneously. This function
-    folds the list with [f] where [f] takes the current element of the list,
-    accumulator and returns a new element of the list of possibly updated
-    accumulator. *)
+(** [map_and_fold ~f ~init l] folds and maps simultaneously. This function folds
+    the list with [f] where [f] takes the current element of the list,
+    accumulator and returns a new element of the list and the possibly updated
+    accumulator. The transormed list and the final value of the accumulator are
+    returned. *)
+val map_and_fold :
+  f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list * 'acc
+
+(** [map_with_fold ~f ~init l] is just like [map_and_fold ~f ~init], except that
+    it does not return the final value of the accumulator. *)
 val map_with_fold :
   f:('a -> 'acc -> 'b * 'acc) -> init:'acc -> 'a list -> 'b list

@@ -22,10 +22,31 @@ let of_lines lines = { is_selected = false; item_type = Lines lines }
    * 1: Unicode box character (right)
 *)
 let item_padding = 4
+let arrow_left_char = "\u{f0a8}"
 
-let vlist_border ~selected items =
-  let max_item_width = Extra.List.max_on Layout.width items in
-  let pad = Extra.String.fill_right max_item_width in
+(* Calculate the number of lines it takes to render [n] issues.
+
+Calculations based on the following reasonin:
+
+- Each issue takes 2 lines
+- A border frame before each issue
+- One last closing border at the end of all issues *)
+let issues_height n = if n = 0 then 0 else (3 * n) + 1
+let height = issues_height Model.Issue.max_issues
+let span = height
+
+let vlist_border ~scroll_start ~selected items =
+  (* Create the scroll element *)
+  let lines = items |> Array.length |> issues_height in
+  let scroll = Scroll.make ~height ~span ~lines ~offset:(3 * scroll_start) in
+  let scroll_doc =
+    match scroll with
+    | None -> Pretty.Doc.str " "
+    | Some scroll -> scroll |> Scroll.to_sections |> Scroll.render
+  in
+
+  (* Calculations for frame padding *)
+  let max_item_width = Extra.Array.max_on Layout.width items in
   let max_width = max_item_width + item_padding in
 
   (* Frame *)
@@ -33,17 +54,22 @@ let vlist_border ~selected items =
   let mid = of_sep @@ "├" ^ Extra.String.repeat_txt (max_width - 2) "─" ^ "┤" in
   let bot = of_sep @@ "╰" ^ Extra.String.repeat_txt (max_width - 2) "─" ^ "╯" in
 
-  (* Selected index in the border list *)
-  let highlight_index = (2 * selected) + 1 in
-
   (* Line *)
+  let to_lines_item item = item |> Layout.to_lines |> of_lines in
   let fmt_line line = Doc.str ("│ " ^ line ^ " │") in
   let fmt_selected_line line =
     Doc.(
       horizontal [ fmt Style.selected "│ "; str line; fmt Style.selected " │" ])
   in
-  let to_lines_item item =
-    item |> Layout.to_lines |> List.map pad |> of_lines
+  let fmt_selected_lines = function
+    | [] -> []
+    | hd :: tl ->
+        let first_line =
+          Doc.(
+            horizontal [ fmt_selected_line hd; str " "; str arrow_left_char ])
+        in
+        let other_lines = List.map fmt_selected_line tl in
+        first_line :: other_lines
   in
 
   let render_item { is_selected; item_type } =
@@ -51,12 +77,20 @@ let vlist_border ~selected items =
     | Separator sep ->
         if is_selected then Doc.[ fmt Style.selected sep ] else Doc.[ str sep ]
     | Lines lines ->
-        if is_selected then List.map fmt_selected_line lines
+        if is_selected then fmt_selected_lines lines
         else List.map fmt_line lines
   in
 
+  (* We're working on elements between [scroll_start] and [scroll_start + max_issues].
+     The invariant: [scroll_start <= selected].
+     Therefore, we subtract [scroll_start] from [selected] to get the true
+     offset in the resulting slice. *)
+  let offset = selected - scroll_start in
+  let highlight_index = (2 * offset) + 1 in
+
   (* Combine *)
   items
+  |> Extra.Array.of_sub_array ~offset:scroll_start ~len:Model.Issue.max_issues
   |> List.map to_lines_item
   |> Extra.List.in_between ~sep:mid
   |> (fun lines -> [ top ] @ lines @ [ bot ])
@@ -69,3 +103,4 @@ let vlist_border ~selected items =
          else item)
   |> List.concat_map render_item
   |> Doc.vertical
+  |> fun issues -> Doc.horizontal [ scroll_doc; issues ]

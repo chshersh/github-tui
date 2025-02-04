@@ -22,7 +22,7 @@ let mk_issues_query ~owner ~repo =
     {|
 query {
   repository(owner: "%s", name: "%s") {
-    issues(first: 10, states: [OPEN, CLOSED], orderBy: {field: CREATED_AT, direction: DESC}) {
+    issues(first: 100, states: [OPEN, CLOSED], orderBy: {field: CREATED_AT, direction: DESC}) {
         nodes {
           number
           title
