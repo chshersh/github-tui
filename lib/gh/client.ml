@@ -2,7 +2,11 @@ module Json = Yojson.Basic.Util
 
 type error =
   | No_github_token
-  | Bad_credentials
+  | Bad_credentials of {
+      msg : string;
+      doc_url : string;
+      code : int;
+    }
   | Curl_error of {
       code : int;
       msg : string;
@@ -26,12 +30,17 @@ let query query_body =
       in
       match response with
       | Error (code, msg) -> Error (Curl_error { code = Curl.errno code; msg })
-      | Ok { body; _ } ->
+      | Ok { body; code; _ } ->
           let open Yojson.Basic in
           let json = from_string body in
-          if Util.member "message" json = `String "Bad credentials" then
-            Error Bad_credentials
-          else Ok json)
+          if Util.member "data" json <> `Null then Ok json
+          else
+            let msg = Util.member "message" json |> Util.to_string in
+            let doc_url =
+              Util.member "documentation_url" json |> Util.to_string
+            in
+            let code = code in
+            Error (Bad_credentials { msg; doc_url; code }))
 
 let parse_response (path : string list) (parse_item : Yojson.Basic.t -> 'a) json
     =

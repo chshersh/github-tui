@@ -26,7 +26,11 @@
 
 type error =
   | No_github_token
-  | Bad_credentials
+  | Bad_credentials of {
+      msg : string;
+      doc_url : string;
+      code : int;
+    }
   | Curl_error of {
       code : int;
       msg : string;

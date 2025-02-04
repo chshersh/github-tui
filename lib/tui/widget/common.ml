@@ -10,16 +10,11 @@ let fmt_error (error : Gh.Client.error) =
         str "If you don't have a token, visit the following page to create one:";
         str "  • https://github.com/settings/tokens";
       ]
-  | Bad_credentials ->
+  | Bad_credentials { msg; doc_url; code } ->
       [
-        str
-          "\u{26A0} Invalid GITHUB_TOKEN. Make sure it's valid, not expired, \
-           and has the proper permissions.";
+        str (Format.sprintf "\u{26A0} [%d] %s" code msg);
         str "";
-        str
-          "If you're unsure about your token's validity, consider regenerating \
-           one:";
-        str "  • https://github.com/settings/tokens";
+        str ("Documentation url: " ^ doc_url);
       ]
   | Curl_error { code; msg } ->
       [
