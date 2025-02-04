@@ -1,3 +1,4 @@
+module Style = Pretty.Style
 module Layout = Pretty.Layout
 
 type 'a t = {
@@ -24,24 +25,13 @@ let fmt_title (issue : Gh.Issue.t) =
       fmt Style.bold (Printf.sprintf "@%s" issue.author);
     ]
 
-let apply_background_color ~color text =
-  let module Color = Pretty.Color in
-  let color = Color.of_hex color in
-  let foreground_suggestion = Color.foreground color in
-  let color_code = Pretty.Color.to_escape_seq color in
-  let text = Printf.sprintf "\027[48;%sm %s \027[0m" color_code text in
-  (text, foreground_suggestion)
-
 let fmt_labels labels =
   let open Layout in
   let fmt_label (label : Gh.Issue.label) =
     let label, foreground =
-      apply_background_color ~color:label.color label.name
+      Style.apply_background_hex_color ~hex:label.color label.name
     in
-    let label = label ^ " " in
-    match foreground with
-    | `Light -> fmt Style.fg_white label
-    | `Dark -> fmt Style.fg_black label
+    fmt (Style.color_of_theme foreground) (label ^ " ")
   in
   labels |> List.map fmt_label |> fun labels -> horizontal (str "   " :: labels)
 

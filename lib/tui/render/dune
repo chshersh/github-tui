@@ -1,6 +1,7 @@
 (library
  (name render)
  (libraries
+  ansifmt
   ;; Internal dependencies
   extra
   gh

@@ -19,7 +19,7 @@
  (depends
    (ocaml (>= "5.1"))
    dune
-   (ANSITerminal (>= "0.8.5"))
+   (ansifmt (>= "0.2.0"))
    (cmdliner (>= "1.2.0"))
    (ezcurl (>= "0.2.4"))
    shape-the-term

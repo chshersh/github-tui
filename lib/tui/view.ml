@@ -1,3 +1,5 @@
+module Style = Pretty.Style
+
 let repo_header (model : Model.t) =
   let owner_repo = model.owner ^ "/" ^ model.repo in
   Pretty.Doc.(fmt Style.repo owner_repo)

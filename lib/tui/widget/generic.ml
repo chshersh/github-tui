@@ -1,5 +1,5 @@
 module Doc = Pretty.Doc
-module Style = Doc.Style
+module Style = Pretty.Style
 module Layout = Pretty.Layout
 
 type item = {
