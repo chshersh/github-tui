@@ -58,7 +58,7 @@ implementation beforehand. However, there're still a few requirements:
 
 That's all so far!
 
-> ![NOTE]
+> [!NOTE]
 > PRs are merged to the `main` branch using the
 > "Squash and merge" button. You can produce granular commit history
 > to make the review easier or if it's your preferred workflow. But
