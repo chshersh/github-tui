@@ -39,7 +39,6 @@ let query query_body =
             let doc_url =
               Util.member "documentation_url" json |> Util.to_string
             in
-            let code = code in
             Error (Bad_credentials { msg; doc_url; code }))
 
 let parse_response (path : string list) (parse_item : Yojson.Basic.t -> 'a) json
