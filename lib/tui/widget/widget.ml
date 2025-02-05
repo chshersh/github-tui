@@ -2,6 +2,7 @@ module Code = Code
 module Issue = Issue
 module Pr = Pr
 module Generic = Generic
+module Style = Pretty.Style
 
 let about_doc (model: Model.t) =
   let widget =
@@ -17,7 +18,7 @@ let about_doc (model: Model.t) =
     ]
   in
   let open Pretty.Doc in
-  widget |> List.map (fmt ANSITerminal.[ cyan ]) |> vertical
+  widget |> List.map (fmt Style.secondary) |> vertical
   [@@ocamlformat "disable"]
 
 let tab_doc ~is_selected tab_lines =

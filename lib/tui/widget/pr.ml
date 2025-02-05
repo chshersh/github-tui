@@ -1,3 +1,5 @@
+module Style = Pretty.Style
+
 let closed_char = "\u{ebda}"
 let open_char = "\u{ea64}"
 let merged_char = "\u{e725}"

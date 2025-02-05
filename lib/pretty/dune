@@ -1,7 +1,7 @@
 (library
  (name pretty)
  (libraries
-  ANSITerminal
+  ansifmt
   shell
   ;; Internal dependencies
   extra))

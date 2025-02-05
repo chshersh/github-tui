@@ -1,5 +1,3 @@
-module Style = Style
-
 (** A type representing a structured document. *)
 type t
 

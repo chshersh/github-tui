@@ -17,7 +17,7 @@ let height { height; _ } = height
 let str string =
   let width = Extra.String.width string in
   let height = 1 in
-  let node = Str ([], string) in
+  let node = Str (Style.none, string) in
   { width; height; node }
 
 let fmt styles string =

@@ -1,3 +1,5 @@
+module Style = Pretty.Style
+
 let scroll ~lines ~span ~offset =
   let height = 40 in
   let scroll = Scroll.make ~height ~span ~lines ~offset in
