@@ -1,4 +1,3 @@
 pin-depends: [
   ["shape-the-term.dev" "git+https://github.com/jmcavanillas/shape-the-term"]
-  ["ansifmt.dev" "git+https://github.com/qexat/ansifmt"]
 ]
