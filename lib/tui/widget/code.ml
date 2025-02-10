@@ -7,12 +7,6 @@ let scroll ~lines ~span ~offset =
   | None -> Pretty.Doc.str " "
   | Some scroll -> scroll |> Scroll.to_sections |> Scroll.render
 
-let pwd_char = "\u{e5fd}"
-let dir_char = "\u{f4d4}"
-let empty_dir_char = "\u{f413}"
-let file_char = "\u{f4a5}"
-let bin_char = "\u{eae8}"
-
 let parents_path parents =
   List.fold_left (fun acc cur -> Filename.concat acc cur) "" (List.rev parents)
 
@@ -20,7 +14,9 @@ let pwd root_dir_path (fs : Fs.zipper) =
   let parents = Fs.zipper_parents fs in
   let pwd_path = parents_path parents in
   let root_dir_name = Filename.basename root_dir_path in
-  let full_path = pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path in
+  let full_path =
+    Pretty.Icon.pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path
+  in
   Pretty.Doc.(fmt Style.directory full_path)
 
 let file_contents_to_doc ~(file_contents : Fs.Filec.t) =
@@ -56,12 +52,12 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
   match tree with
   | File (name, _, file_type) -> (
       match Lazy.force file_type with
-      | Fs.Filec.Text -> file_char ^ " " ^ pad name
-      | Fs.Filec.Binary -> bin_char ^ " " ^ pad name)
+      | Fs.Filec.Text -> Pretty.Icon.file_char ^ " " ^ pad name
+      | Fs.Filec.Binary -> Pretty.Icon.bin_char ^ " " ^ pad name)
   | Dir (name, (lazy children)) -> (
       match children with
-      | [||] -> empty_dir_char ^ " " ^ pad name
-      | _ -> dir_char ^ " " ^ pad name)
+      | [||] -> Pretty.Icon.empty_dir_char ^ " " ^ pad name
+      | _ -> Pretty.Icon.dir_char ^ " " ^ pad name)
 
 let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   let open Pretty.Doc in
