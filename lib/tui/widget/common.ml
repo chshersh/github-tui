@@ -13,7 +13,7 @@ let fmt_error (error : Gh.Client.error) =
       ]
   | Bad_credentials { msg; doc_url; code } ->
       [
-        str (Pretty.Icon.warning ^ Format.sprintf " [%d] %s" code msg);
+        str (Format.sprintf "%s [%d] %s" Pretty.Icon.warning code msg);
         str "";
         str ("Documentation url: " ^ doc_url);
       ]
