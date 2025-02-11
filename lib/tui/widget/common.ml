@@ -20,8 +20,8 @@ let fmt_error (error : Gh.Client.error) =
   | Curl_error { code; msg } ->
       [
         str
-          (Pretty.Icon.warning
-          ^ Format.sprintf " GitHub API returned error code: %d" code);
+          (Format.sprintf "%s GitHub API returned error code: %d"
+             Pretty.Icon.warning code);
         str "";
         str msg;
       ]
