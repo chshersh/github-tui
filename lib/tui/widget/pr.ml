@@ -1,9 +1,5 @@
 module Style = Pretty.Style
 
-let closed_char = "\u{ebda}"
-let open_char = "\u{ea64}"
-let merged_char = "\u{e725}"
-
 let section (tab : Model.Pr.t) =
   let open Pretty.Doc in
   let docs =
@@ -11,9 +7,9 @@ let section (tab : Model.Pr.t) =
     | None ->
         let fmt_state = function
           | None -> str ""
-          | Some Gh.Pr.Merged -> fmt Style.pr_merged merged_char
-          | Some Gh.Pr.Open -> fmt Style.pr_open open_char
-          | Some Gh.Pr.Closed -> fmt Style.pr_closed closed_char
+          | Some Gh.Pr.Merged -> fmt Style.pr_merged Pretty.Icon.merged_char
+          | Some Gh.Pr.Open -> fmt Style.pr_open Pretty.Icon.open_char
+          | Some Gh.Pr.Closed -> fmt Style.pr_closed Pretty.Icon.closed_char
         in
         let fmt_pr (pr : Gh.Pr.t) =
           Pretty.Doc.(
