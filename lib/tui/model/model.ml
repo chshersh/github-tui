@@ -24,6 +24,7 @@ type t = {
   code_tab : code_tab;
   issues_tab : Issue.t;
   pull_requests_tab : Pr.t;
+  no_nerd_font : bool;
 }
 
 type initial_data = {
@@ -33,9 +34,12 @@ type initial_data = {
   files : Fs.tree array;
   width : int;
   height : int;
+  no_nerd_font : bool;
 }
 
-let initial_model { owner; repo; root_dir_path; files; width; height } =
+let initial_model
+    { owner; repo; root_dir_path; files; width; height; no_nerd_font } =
+  let icons = Pretty.Icon.get_icons no_nerd_font in
   {
     width;
     height;
@@ -43,6 +47,7 @@ let initial_model { owner; repo; root_dir_path; files; width; height } =
     repo;
     current_tab = Code;
     code_tab = { root_dir_path; fs = Fs.zip_it files };
-    issues_tab = Issue.make ~owner ~repo;
+    issues_tab = Issue.make ~owner ~repo icons;
     pull_requests_tab = Pr.make ~owner ~repo;
+    no_nerd_font;
   }

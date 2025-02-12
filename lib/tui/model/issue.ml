@@ -39,12 +39,12 @@ let apply_filter filter t =
     let scroll_start = 0 in
     { t with filter; issues; offset; scroll_start }
 
-let make ~owner ~repo =
+let make ~owner ~repo icons =
   let issues_and_errors =
     lazy
       (match Gh.Issue.issues ~owner ~repo with
       | Ok issues ->
-          let rendered = Render.issues issues in
+          let rendered = Render.issues issues icons in
           (rendered, None)
       | Error err -> ([], Some err))
   in

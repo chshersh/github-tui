@@ -3,5 +3,6 @@
  (libraries
   ansifmt
   shell
+  str
   ;; Internal dependencies
   extra))

@@ -37,13 +37,13 @@ let fmt_filters current_filter =
   let pad = Doc.str " " in
   Doc.horizontal [ filter_open; pad; filter_closed; pad; filter_all ]
 
-let fmt_issues ~selected issues =
+let fmt_issues ~scroll_start ~selected issues icons =
   issues
   |> Lazy.force
   |> Array.map (fun (rendered : _ Render.t) -> rendered.layout)
-  |> Generic.vlist_border ~selected
+  |> fun i -> Generic.vlist_border ~scroll_start ~selected i icons
 
-let section (issues_tab : Model.Issue.t) =
+let section (issues_tab : Model.Issue.t) icons =
   let docs =
     match issues_tab.error |> Lazy.force with
     | None ->
@@ -51,8 +51,8 @@ let section (issues_tab : Model.Issue.t) =
           fmt_filters issues_tab.filter;
           Doc.str "";
           fmt_issues ~scroll_start:issues_tab.scroll_start
-            ~selected:issues_tab.offset issues_tab.issues;
+            ~selected:issues_tab.offset issues_tab.issues icons;
         ]
-    | Some error -> Common.fmt_error error
+    | Some error -> Common.fmt_error error icons
   in
   Doc.vertical docs

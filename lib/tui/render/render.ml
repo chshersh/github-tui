@@ -6,16 +6,16 @@ type 'a t = {
   layout : Pretty.Layout.t;
 }
 
-let fmt_issue_state (state : Gh.Issue.state) =
+let fmt_issue_state (state : Gh.Issue.state) (icons : Pretty.Icon.t) =
   match state with
-  | Open -> Layout.(fmt Style.issue_open Pretty.Icon.issue_char)
-  | Closed -> Layout.(fmt Style.issue_closed Pretty.Icon.issue_char)
+  | Open -> Layout.(fmt Style.issue_open icons.issue_char)
+  | Closed -> Layout.(fmt Style.issue_closed icons.issue_char)
 
-let fmt_title (issue : Gh.Issue.t) =
+let fmt_title (issue : Gh.Issue.t) (icons : Pretty.Icon.t) =
   let open Layout in
   horizontal
     [
-      fmt_issue_state issue.state;
+      fmt_issue_state issue.state icons;
       str "  ";
       fmt Style.secondary (Printf.sprintf "#%d " issue.number);
       str issue.title;
@@ -33,11 +33,11 @@ let fmt_labels labels =
   in
   labels |> List.map fmt_label |> fun labels -> horizontal (str "   " :: labels)
 
-let fmt_issue (issue : Gh.Issue.t) =
-  Layout.vertical [ fmt_title issue; fmt_labels issue.labels ]
+let fmt_issue (issue : Gh.Issue.t) (icons : Pretty.Icon.t) =
+  Layout.vertical [ fmt_title issue icons; fmt_labels issue.labels ]
 
-let issues issue_list =
-  let layouts = List.map fmt_issue issue_list in
+let issues issue_list icons =
+  let layouts = List.map (fun issue -> fmt_issue issue icons) issue_list in
   let max_issue_width = Extra.List.max_on Layout.width layouts in
   ListLabels.map2 issue_list layouts ~f:(fun issue layout ->
       let width = Layout.width layout in

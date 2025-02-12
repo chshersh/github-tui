@@ -4,4 +4,5 @@
   ;; Internal dependencies
   fs
   gh
+  pretty
   render))

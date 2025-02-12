@@ -22,12 +22,22 @@ let ignore_size_warning_arg =
   let doc = "Ignore the minimum size warning." in
   Arg.(value & flag & info [ "i"; "ignore-size-warning" ] ~doc)
 
-let run owner_repo local_path log_file ignore_size_warning =
-  Tui.start { owner_repo; local_path; log_file; ignore_size_warning }
+let no_nerd_font_arg =
+  let doc = "Don't try to use Nerd Font Icons." in
+  Arg.(value & flag & info [ "n"; "no-nerd-font" ] ~doc)
+
+let run owner_repo local_path log_file ignore_size_warning no_nerd_font =
+  Tui.start
+    { owner_repo; local_path; log_file; ignore_size_warning; no_nerd_font }
 
 let gh_tui_term =
   Term.(
-    const run $ owner_repo_arg $ path_arg $ log_arg $ ignore_size_warning_arg)
+    const run
+    $ owner_repo_arg
+    $ path_arg
+    $ log_arg
+    $ ignore_size_warning_arg
+    $ no_nerd_font_arg)
 
 let cmd =
   let doc = "TUI of a GitHub repository" in
