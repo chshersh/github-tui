@@ -54,11 +54,11 @@ let max_file_name_len files =
 let fmt_file ~max_name_len (tree : Fs.tree) =
   let pad = Extra.String.fill_right max_name_len in
   match tree with
-  | File (name, _, file_type) -> (
+  | File { name; file_type; _ } -> (
       match Lazy.force file_type with
       | Fs.Filec.Text -> file_char ^ " " ^ pad name
       | Fs.Filec.Binary -> bin_char ^ " " ^ pad name)
-  | Dir (name, (lazy children)) -> (
+  | Dir { name; children = (lazy children) } -> (
       match children with
       | [||] -> empty_dir_char ^ " " ^ pad name
       | _ -> dir_char ^ " " ^ pad name)
@@ -193,8 +193,8 @@ let fs_to_view (fs : Fs.zipper) =
     | File_cursor contents, parent :: _ -> (parent, File_selected contents)
     | Dir_cursor cursor, _ -> (
         match Fs.file_at cursor with
-        | File (_, contents, _) -> (cursor, File_selected (Lazy.force contents))
-        | Dir (_, children) ->
+        | File { contents; _ } -> (cursor, File_selected (Lazy.force contents))
+        | Dir { children; _ } ->
             ( cursor,
               Dir_selected
                 {

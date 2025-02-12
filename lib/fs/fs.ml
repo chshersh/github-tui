@@ -1,8 +1,15 @@
 module Filec = Filec
 
 type tree =
-  | File of string * Filec.t Lazy.t * Filec.file_type Lazy.t
-  | Dir of string * tree array Lazy.t
+  | File of {
+      name : string;
+      contents : Filec.t Lazy.t;
+      file_type : Filec.file_type Lazy.t;
+    }
+  | Dir of {
+      name : string;
+      children : tree array Lazy.t;
+    }
 
 type dir_cursor = {
   pos : int;
@@ -15,8 +22,8 @@ type cursor =
 
 (* Extracts the file name from a tree node *)
 let file_name = function
-  | File (name, _, _) -> name
-  | Dir (name, _) -> name
+  | File { name; _ } -> name
+  | Dir { name; _ } -> name
 
 (* A files comparison:
 
@@ -30,10 +37,10 @@ let order_files t1 t2 =
   | _, _ -> String.compare (file_name t1) (file_name t2)
 
 let rec sort_tree = function
-  | File (name, contents, ft) -> File (name, contents, ft)
-  | Dir (name, (lazy children)) ->
+  | File _ as f -> f
+  | Dir { name; children = (lazy children) } ->
       Array.sort order_files children;
-      Dir (name, lazy (Array.map sort_tree children))
+      Dir { name; children = lazy (Array.map sort_tree children) }
 
 (* Recursively reads a directory tree *)
 let rec to_tree path =
@@ -45,12 +52,14 @@ let rec to_tree path =
            (Sys.readdir path))
     in
     let dirname = Filename.basename path in
-    Dir (dirname, children)
+    Dir { name = dirname; children }
   else
     File
-      ( Filename.basename path,
-        lazy (Filec.read path),
-        lazy (Filec.type_of_path path) )
+      {
+        name = Filename.basename path;
+        contents = lazy (Filec.read path);
+        file_type = lazy (Filec.type_of_path path);
+      }
 
 let read_tree path = path |> to_tree |> sort_tree
 let file_at cursor = cursor.files.(cursor.pos)
@@ -100,12 +109,12 @@ let go_next zipper =
   | Dir_cursor cursor -> (
       let next = file_at cursor in
       match next with
-      | File (_name, contents, _) ->
+      | File { contents; _ } ->
           {
             parents = cursor :: zipper.parents;
             current = File_cursor (Lazy.force contents);
           }
-      | Dir (_, (lazy next)) ->
+      | Dir { children = (lazy next); _ } ->
           if Array.length next = 0 then zipper
           else
             {
