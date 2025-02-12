@@ -1,9 +1,9 @@
 module Doc = Pretty.Doc
-module Style = Doc.Style
+module Style = Pretty.Style
 module Layout = Pretty.Layout
 
 let fmt_filter ~style ~is_selected filter_box =
-  let fmt = if is_selected then Doc.fmt (style @ Style.bold) else Doc.str in
+  let fmt = if is_selected then Doc.fmt Style.(style & bold) else Doc.str in
   filter_box |> List.map fmt |> Doc.vertical
 
 let fmt_filters current_filter =
@@ -27,7 +27,7 @@ let fmt_filters current_filter =
   in
   let filter_all =
     fmt_filter
-    ~style:[]
+    ~style:Style.none
     ~is_selected:(current_filter = Model.Issue.filter_all)
     [ "╭─────────╮";
       "│ All   a │";

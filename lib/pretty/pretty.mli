@@ -1,5 +1,8 @@
 (** A library for declarative UI definition. *)
 
+(** Common styles for GitHub TUI. *)
+module Style = Style
+
 (** A module containing declarative UI definition. The elements provide
     flexibility. *)
 module Doc = Doc
@@ -9,9 +12,6 @@ module Doc = Doc
 
     {!Layout.t} is the output of {!Doc.render} with all the sizes calculated. *)
 module Layout = Layout
-
-(** Color-related functions. *)
-module Color = Color
 
 (** Render a document into the final string
 

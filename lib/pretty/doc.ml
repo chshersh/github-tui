@@ -7,7 +7,7 @@ type t =
   | Horizontal of t list
   | With_size of (width:int -> height:int -> t)
 
-let str string = Str ([], string)
+let str string = Str (Style.none, string)
 let fmt styles string = Str (styles, string)
 let horizontal cols = Horizontal cols
 let vertical rows = Vertical rows

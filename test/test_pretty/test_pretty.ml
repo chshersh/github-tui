@@ -1,1 +1,1 @@
-let tests = List.flatten [ Test_color.tests ]
+let tests = List.flatten []
