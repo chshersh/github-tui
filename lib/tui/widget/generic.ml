@@ -66,7 +66,9 @@ let vlist_border ~scroll_start ~selected items =
         let first_line =
           Doc.(
             horizontal
-              [ fmt_selected_line hd; str " "; str Pretty.Icon.arrow_left_char ])
+              [
+                fmt_selected_line hd; str " "; str Pretty.icons.arrow_left_char;
+              ])
         in
         let other_lines = List.map fmt_selected_line tl in
         first_line :: other_lines

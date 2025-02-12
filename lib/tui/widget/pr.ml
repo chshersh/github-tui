@@ -7,9 +7,9 @@ let section (tab : Model.Pr.t) =
     | None ->
         let fmt_state = function
           | None -> str ""
-          | Some Gh.Pr.Merged -> fmt Style.pr_merged Pretty.Icon.merged_char
-          | Some Gh.Pr.Open -> fmt Style.pr_open Pretty.Icon.open_char
-          | Some Gh.Pr.Closed -> fmt Style.pr_closed Pretty.Icon.closed_char
+          | Some Gh.Pr.Merged -> fmt Style.pr_merged Pretty.icons.merged_char
+          | Some Gh.Pr.Open -> fmt Style.pr_open Pretty.icons.open_char
+          | Some Gh.Pr.Closed -> fmt Style.pr_closed Pretty.icons.closed_char
         in
         let fmt_pr (pr : Gh.Pr.t) =
           Pretty.Doc.(

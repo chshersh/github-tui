@@ -1,5 +1,6 @@
 module Style = Pretty.Style
 module Layout = Pretty.Layout
+module Icon = Pretty.Icon
 
 type 'a t = {
   item : 'a;
@@ -8,8 +9,8 @@ type 'a t = {
 
 let fmt_issue_state (state : Gh.Issue.state) =
   match state with
-  | Open -> Layout.(fmt Style.issue_open Pretty.Icon.issue_char)
-  | Closed -> Layout.(fmt Style.issue_closed Pretty.Icon.issue_char)
+  | Open -> Layout.(fmt Style.issue_open Icon.icons.issue_char)
+  | Closed -> Layout.(fmt Style.issue_closed Icon.icons.issue_char)
 
 let fmt_title (issue : Gh.Issue.t) =
   let open Layout in

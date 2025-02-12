@@ -15,7 +15,7 @@ let pwd root_dir_path (fs : Fs.zipper) =
   let pwd_path = parents_path parents in
   let root_dir_name = Filename.basename root_dir_path in
   let full_path =
-    Pretty.Icon.pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path
+    Pretty.Icon.icons.pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path
   in
   Pretty.Doc.(fmt Style.directory full_path)
 
@@ -52,12 +52,12 @@ let fmt_file ~max_name_len (tree : Fs.tree) =
   match tree with
   | File { name; file_type; _ } -> (
       match Lazy.force file_type with
-      | Fs.Filec.Text -> Pretty.Icon.file_char ^ " " ^ pad name
-      | Fs.Filec.Binary -> Pretty.Icon.bin_char ^ " " ^ pad name)
+      | Fs.Filec.Text -> Pretty.icons.file_char ^ " " ^ pad name
+      | Fs.Filec.Binary -> Pretty.icons.bin_char ^ " " ^ pad name)
   | Dir { name; children = (lazy children) } -> (
       match children with
-      | [||] -> Pretty.Icon.empty_dir_char ^ " " ^ pad name
-      | _ -> Pretty.Icon.dir_char ^ " " ^ pad name)
+      | [||] -> Pretty.icons.empty_dir_char ^ " " ^ pad name
+      | _ -> Pretty.icons.dir_char ^ " " ^ pad name)
 
 let current_level_to_doc (cursor : Fs.dir_cursor) ~has_next ~is_file_chosen =
   let open Pretty.Doc in
