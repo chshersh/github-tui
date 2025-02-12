@@ -19,9 +19,8 @@ module Layout = Layout
     - https://www.nerdfonts.com/cheat-sheet *)
 module Icon = Icon
 
-val icons : Icon.t
-
 (** A record representing the icon set **)
+val icons : Icon.t
 
 (** Render a document into the final string
 
