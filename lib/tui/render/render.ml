@@ -6,12 +6,10 @@ type 'a t = {
   layout : Pretty.Layout.t;
 }
 
-let issue_char = "\u{f41b}"
-
 let fmt_issue_state (state : Gh.Issue.state) =
   match state with
-  | Open -> Layout.(fmt Style.issue_open issue_char)
-  | Closed -> Layout.(fmt Style.issue_closed issue_char)
+  | Open -> Layout.(fmt Style.issue_open Pretty.Icon.issue_char)
+  | Closed -> Layout.(fmt Style.issue_closed Pretty.Icon.issue_char)
 
 let fmt_title (issue : Gh.Issue.t) =
   let open Layout in
