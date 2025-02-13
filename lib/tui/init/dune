@@ -1,0 +1,7 @@
+(library
+ (name init)
+ (libraries
+  ;; Internal dependencies
+  terminal_size
+  model
+  fs))
