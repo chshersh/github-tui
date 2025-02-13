@@ -2,10 +2,20 @@
     and current offsets. *)
 module Filec = Filec
 
+(* NOTE: contents and file_type are stored separately so we can know the file
+    type and assign a proper icon without reading the contents *)
+
 (** A definition of a file tree. *)
 type tree =
-  | File of string * Filec.t Lazy.t * Filec.file_type Lazy.t
-  | Dir of string * tree array Lazy.t
+  | File of {
+      name : string;
+      contents : Filec.t Lazy.t;
+      file_type : Filec.file_type Lazy.t;
+    }
+  | Dir of {
+      name : string;
+      children : tree array Lazy.t;
+    }
 
 (** Return the name of a given tree node. *)
 val file_name : tree -> string
