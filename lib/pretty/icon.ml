@@ -12,11 +12,12 @@ type t = {
   issue_char : string;
 }
 
+let fc_list_cmd = {| fc-list | grep 'Hack Nerd Font Mono' |}
+
 (** Use fc-list to check if Hack Nerd Font is installed - this might be a little
     brittle, but it's simple - update if it becomes an issue. **)
 let nerd_font_installed () =
-  let cmd = "fc-list | grep 'Hack Nerd Font Mono' > /dev/null 2>&1" in
-  if Sys.command cmd = 0 then true else false
+  fc_list_cmd |> Shell.proc_stdout |> String.trim |> String.length > 0
 
 let icons =
   if nerd_font_installed () then
