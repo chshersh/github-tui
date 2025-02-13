@@ -29,8 +29,8 @@ let read_root_tree ~root_dir_path =
   let tree = Fs.read_tree root_dir_path in
   let files =
     match tree with
-    | Fs.File { name = path; _ } ->
-        Printf.eprintf "Given path '%s' is not a directory!" path;
+    | Fs.File { name; _ } ->
+        Printf.eprintf "Given path '%s' is not a directory!" name;
         exit 1
     | Fs.Dir { children = files; _ } -> files
   in

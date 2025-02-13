@@ -51,8 +51,8 @@ let rec to_tree path =
            (fun child_name -> to_tree (Filename.concat path child_name))
            (Sys.readdir path))
     in
-    let dirname = Filename.basename path in
-    Dir { name = dirname; children }
+    let name = Filename.basename path in
+    Dir { name; children }
   else
     File
       {
