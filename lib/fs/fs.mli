@@ -2,6 +2,9 @@
     and current offsets. *)
 module Filec = Filec
 
+(* NOTE: contents and file_type are stored separately so we can know the file
+    type and assign a proper icon without reading the contents *)
+
 (** A definition of a file tree. *)
 type tree =
   | File of {
