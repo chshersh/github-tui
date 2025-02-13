@@ -22,7 +22,6 @@ let of_lines lines = { is_selected = false; item_type = Lines lines }
    * 1: Unicode box character (right)
 *)
 let item_padding = 4
-let arrow_left_char = "\u{f0a8}"
 
 (* Calculate the number of lines it takes to render [n] issues.
 
@@ -66,7 +65,8 @@ let vlist_border ~scroll_start ~selected items =
     | hd :: tl ->
         let first_line =
           Doc.(
-            horizontal [ fmt_selected_line hd; str " "; str arrow_left_char ])
+            horizontal
+              [ fmt_selected_line hd; str " "; str Pretty.Icon.arrow_left_char ])
         in
         let other_lines = List.map fmt_selected_line tl in
         first_line :: other_lines
