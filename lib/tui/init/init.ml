@@ -69,8 +69,8 @@ type t = {
   ignore_size_warning : bool;
 }
 
-let init { owner_repo; local_path; ignore_size_warning; _ } : Model.initial_data
-    =
+let init { owner_repo; local_path; ignore_size_warning; log_file = _ } :
+    Model.initial_data =
   let ({ owner; repo } as owner_repo) = parse_owner_repo owner_repo in
   let root_dir_path = clone_repo ~owner_repo ~local_path in
   let files = Lazy.force (read_root_tree ~root_dir_path) in

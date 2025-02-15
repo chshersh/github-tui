@@ -6,10 +6,10 @@
   extra
   fs
   gh
+  init
   log
   model
   pretty
   shell
   tea
-  widget
-  init))
+  widget))
