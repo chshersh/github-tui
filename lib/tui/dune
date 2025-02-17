@@ -6,6 +6,7 @@
   extra
   fs
   gh
+  init
   log
   model
   pretty

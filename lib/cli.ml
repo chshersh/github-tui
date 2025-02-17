@@ -23,7 +23,7 @@ let ignore_size_warning_arg =
   Arg.(value & flag & info [ "i"; "ignore-size-warning" ] ~doc)
 
 let run owner_repo local_path log_file ignore_size_warning =
-  Tui.start ~owner_repo ~local_path ~log_file ~ignore_size_warning
+  Tui.start { owner_repo; local_path; log_file; ignore_size_warning }
 
 let gh_tui_term =
   Term.(
