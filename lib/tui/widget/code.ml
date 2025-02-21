@@ -15,7 +15,7 @@ let pwd root_dir_path (fs : Fs.zipper) =
   let pwd_path = parents_path parents in
   let root_dir_name = Filename.basename root_dir_path in
   let full_path =
-    Pretty.Icon.icons.pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path
+    Pretty.icons.pwd_char ^ " " ^ Filename.concat root_dir_name pwd_path
   in
   Pretty.Doc.(fmt Style.directory full_path)
 

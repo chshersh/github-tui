@@ -1,7 +1,6 @@
 module Doc = Doc
 module Layout = Layout
 module Style = Style
-module Icon = Icon
 
 let icons = Icon.icons
 

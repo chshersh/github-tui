@@ -13,13 +13,11 @@ module Doc = Doc
     {!Layout.t} is the output of {!Doc.render} with all the sizes calculated. *)
 module Layout = Layout
 
-(** Icons and symbols used for identifying different parts. Symbols from Hack
-    Nerd Font Mono are used when it's available. Symbols list:
+(** A record representign the Icons and symbols used for identifying different
+    parts. Symbols from Hack Nerd Font Mono are used when it's available.
+    Symbols list:
 
     - https://www.nerdfonts.com/cheat-sheet *)
-module Icon = Icon
-
-(** A record representing the icon set **)
 val icons : Icon.t
 
 (** Render a document into the final string
