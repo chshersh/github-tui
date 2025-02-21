@@ -12,7 +12,7 @@ type t = {
   issue_char : string;
 }
 
-let hack_nerd_font = "Hack Nerd Font Mono"
+let hack_nerd_font = "HackNerdFontMono"
 let fc_list_cmd = Printf.sprintf "fc-list | grep '%s'" hack_nerd_font
 let uname_cmd = {| uname |}
 
