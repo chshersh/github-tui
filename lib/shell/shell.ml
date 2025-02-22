@@ -1,7 +1,15 @@
 let proc cmd =
   Printf.eprintf "🐚  %s\n%!" cmd;
-  let _exit_code = Unix.system cmd in
-  ()
+  match Unix.system cmd with
+  | Unix.WEXITED 0 -> Ok ()
+  | Unix.WEXITED return_code ->
+      Error
+        (Printf.sprintf "command '%s' failed with code %d" (String.escaped cmd)
+           return_code)
+  | Unix.WSIGNALED number | Unix.WSTOPPED number ->
+      Error
+        (Printf.sprintf "command '%s' was stopped by signal (%d)"
+           (String.escaped cmd) number)
 
 let collect_chan (channel : in_channel) : string =
   let rec loop acc =
