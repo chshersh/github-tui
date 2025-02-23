@@ -29,7 +29,7 @@ let uname_result =
 (* Based on the list of possible folders here: https://github.com/adrg/xdg/blob/master/README.md#other-directories*)
 let mac_font_dirs =
   [
-    "~/Library/Fonts";
+    Unix.getenv "HOME" ^ "/Library/Fonts";
     "/Library/Fonts";
     "/System/Library/Fonts";
     "/Network/Library/Fonts";
