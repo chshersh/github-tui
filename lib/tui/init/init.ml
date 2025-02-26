@@ -22,7 +22,11 @@ let clone_repo ~owner_repo ~local_path =
         Printf.sprintf "git clone git@github.com:%s/%s.git %s" owner repo
           temp_dir
       in
-      Shell.proc cmd;
+      Shell.proc cmd
+      |> Result.iter_error (fun message ->
+             Printf.eprintf "❌ %s\n" message;
+             exit 1);
+
       temp_dir
 
 let read_root_tree ~root_dir_path =
