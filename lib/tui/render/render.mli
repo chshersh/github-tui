@@ -12,4 +12,4 @@ type 'a t = {
 }
 
 (** [issue_items issues] renders issues*)
-val issues : Gh.Issue.t list -> Gh.Issue.t t list
+val issues : Gh.Issue.t list -> Pretty.Icon.t -> Gh.Issue.t t list

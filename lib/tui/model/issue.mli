@@ -22,7 +22,7 @@ and filter =
 val filter_all : filter
 val filter_open : filter
 val filter_closed : filter
-val make : owner:string -> repo:string -> t
+val make : owner:string -> repo:string -> Pretty.Icon.t -> t
 
 (** Change the filter to a new one and update currently selected issues. *)
 val apply_filter : filter -> t -> t

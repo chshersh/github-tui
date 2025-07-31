@@ -21,4 +21,8 @@
     This function takes values of type {!Pretty.Layout.t}, so it could
     efficiently calculate the size of element per line. *)
 val vlist_border :
-  scroll_start:int -> selected:int -> Pretty.Layout.t array -> Pretty.Doc.t
+  scroll_start:int ->
+  selected:int ->
+  Pretty.Layout.t array ->
+  Pretty.Icon.t ->
+  Pretty.Doc.t

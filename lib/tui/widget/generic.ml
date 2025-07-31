@@ -34,7 +34,7 @@ let issues_height n = if n = 0 then 0 else (3 * n) + 1
 let height = issues_height Model.Issue.max_issues
 let span = height
 
-let vlist_border ~scroll_start ~selected items =
+let vlist_border ~scroll_start ~selected items (icons : Pretty.Icon.t) =
   (* Create the scroll element *)
   let lines = items |> Array.length |> issues_height in
   let scroll = Scroll.make ~height ~span ~lines ~offset:(3 * scroll_start) in
@@ -66,7 +66,7 @@ let vlist_border ~scroll_start ~selected items =
         let first_line =
           Doc.(
             horizontal
-              [ fmt_selected_line hd; str " "; str Pretty.Icon.arrow_left_char ])
+              [ fmt_selected_line hd; str " "; str icons.arrow_left_char ])
         in
         let other_lines = List.map fmt_selected_line tl in
         first_line :: other_lines

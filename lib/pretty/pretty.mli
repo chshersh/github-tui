@@ -15,7 +15,6 @@ module Layout = Layout
 
 (** Icons and symbols used for identifying different parts. Symbols from Hack
     Nerd Font Mono are used when it's available. Symbols list:
-
     - https://www.nerdfonts.com/cheat-sheet *)
 module Icon = Icon
 
