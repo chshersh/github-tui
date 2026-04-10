@@ -34,11 +34,21 @@ type initial_data = {
   files : Fs.tree array;
   width : int;
   height : int;
+  show_gitignored : bool;
   no_nerd_font : bool;
 }
 
 let initial_model
-    { owner; repo; root_dir_path; files; width; height; no_nerd_font } =
+    {
+      owner;
+      repo;
+      root_dir_path;
+      files;
+      width;
+      height;
+      show_gitignored;
+      no_nerd_font;
+    } =
   let icons = Pretty.Icon.get_icons no_nerd_font in
   {
     width;
@@ -46,7 +56,7 @@ let initial_model
     owner;
     repo;
     current_tab = Code;
-    code_tab = { root_dir_path; fs = Fs.zip_it files };
+    code_tab = { root_dir_path; fs = Fs.zip_it ~show_ignored:show_gitignored files };
     issues_tab = Issue.make ~owner ~repo icons;
     pull_requests_tab = Pr.make ~owner ~repo;
     no_nerd_font;

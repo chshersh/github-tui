@@ -1,1 +1,3 @@
-let () = Alcotest.run "GitHub TUI" [ ("Pretty", Test_pretty.tests) ]
+let () =
+  Alcotest.run "GitHub TUI"
+    [ ("FS", Test_fs.tests); ("Pretty", Test_pretty.tests) ]

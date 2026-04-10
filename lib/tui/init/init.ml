@@ -56,7 +56,7 @@ let get_terminal_dimensions ignore_size_warning =
           {|⚠️ Terminal size is too small! GitHub TUI works better on bigger terminals.
           Expected size: %3d width x %3d height
                 But got: %3d width x %3d height
-      
+
       Pass the --ignore-size-warning flag to run anyway.
 |}
           min_width min_height width height;
@@ -71,14 +71,31 @@ type t = {
   local_path : string option;
   log_file : string option;
   ignore_size_warning : bool;
+  show_gitignored : bool;
   no_nerd_font : bool;
 }
 
 let init
-    { owner_repo; local_path; ignore_size_warning; log_file = _; no_nerd_font }
+    {
+      owner_repo;
+      local_path;
+      ignore_size_warning;
+      log_file = _;
+      show_gitignored;
+      no_nerd_font;
+    }
     : Model.initial_data =
   let ({ owner; repo } as owner_repo) = parse_owner_repo owner_repo in
   let root_dir_path = clone_repo ~owner_repo ~local_path in
   let files = Lazy.force (read_root_tree ~root_dir_path) in
   let { height; width } = get_terminal_dimensions ignore_size_warning in
-  { owner; repo; root_dir_path; files; width; height; no_nerd_font }
+  {
+    owner;
+    repo;
+    root_dir_path;
+    show_gitignored;
+    files;
+    width;
+    height;
+    no_nerd_font;
+  }

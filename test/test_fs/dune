@@ -1,0 +1,7 @@
+(library
+ (name test_fs)
+ (libraries
+  alcotest
+  ; Internal libraries
+  fs
+  test_extra))

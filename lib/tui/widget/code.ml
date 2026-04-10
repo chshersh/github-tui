@@ -47,6 +47,18 @@ let max_file_name_len files =
   |> Array.map (fun file -> file |> Fs.file_name |> Extra.String.width)
   |> Array.fold_left max 0
 
+let file_is_ignored (tree : Fs.tree) =
+  match tree with
+  | Fs.File { ignored; _ } | Fs.Dir { ignored; _ } -> ignored
+
+let filter_children ~show_ignored children =
+  if show_ignored then children
+  else
+    children
+    |> Array.to_list
+    |> List.filter (fun child -> not (file_is_ignored child))
+    |> Array.of_list
+
 let fmt_file ~max_name_len (tree : Fs.tree) (icons : Pretty.Icon.t) =
   let pad = Extra.String.fill_right max_name_len in
   match tree with
@@ -54,7 +66,7 @@ let fmt_file ~max_name_len (tree : Fs.tree) (icons : Pretty.Icon.t) =
       match Lazy.force file_type with
       | Fs.Filec.Text -> icons.file_char ^ " " ^ pad name
       | Fs.Filec.Binary -> icons.bin_char ^ " " ^ pad name)
-  | Dir { name; children = (lazy children) } -> (
+  | Dir { name; children = (lazy children); _ } -> (
       match children with
       | [||] -> icons.empty_dir_char ^ " " ^ pad name
       | _ -> icons.dir_char ^ " " ^ pad name)
@@ -138,6 +150,7 @@ let children_to_doc ~prev_total ~pos children icons =
     |> List.map str
     |> vertical
   in
+
   horizontal [ connector_doc; files_doc ]
 
 type next_level =
@@ -154,7 +167,7 @@ type selected_node =
   | Dir_selected of {
       prev_total : int;
       pos : int;
-      children : Fs.tree array Lazy.t;
+      children : Fs.tree array;
     }
 
 let next_level_to_doc selected_node icons =
@@ -163,7 +176,6 @@ let next_level_to_doc selected_node icons =
   | File_selected file_contents ->
       File_contents (file_contents_to_doc ~file_contents)
   | Dir_selected { children; prev_total; pos } -> (
-      let children = Lazy.force children in
       match children with
       (* No children of a directory without children *)
       | [||] -> Empty_directory
@@ -190,17 +202,23 @@ let fs_to_view (fs : Fs.zipper) =
         failwith
           "Error during rendering! Impossible to have a file without a parent"
     | File_cursor contents, parent :: _ -> (parent, File_selected contents)
-    | Dir_cursor cursor, _ -> (
-        match Fs.file_at cursor with
-        | File { contents; _ } -> (cursor, File_selected (Lazy.force contents))
-        | Dir { children; _ } ->
-            ( cursor,
-              Dir_selected
-                {
-                  children;
-                  prev_total = Array.length cursor.files;
-                  pos = cursor.pos;
-                } ))
+    | Dir_cursor cursor, _ ->
+        if Array.length cursor.files = 0 then
+          (cursor, Dir_selected { children = [||]; prev_total = 0; pos = 0 })
+        else
+          match Fs.file_at cursor with
+          | File { contents; _ } -> (cursor, File_selected (Lazy.force contents))
+          | Dir { children = (lazy children); _ } ->
+              let visible_children =
+                filter_children ~show_ignored:fs.show_ignored children
+              in
+              ( cursor,
+                Dir_selected
+                  {
+                    children = visible_children;
+                    prev_total = Array.length cursor.files;
+                    pos = cursor.pos;
+                  } )
   in
 
   { left; right; is_file_chosen }

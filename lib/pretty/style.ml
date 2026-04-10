@@ -20,6 +20,9 @@ let directory = Styling.(bold & fg Color.magenta)
 (* When a file in a tree viewer is chosen. *)
 let chosen = Styling.(bold & fg Color.magenta)
 
+(* Mark Gitignored files *)
+let gitignored = Styling.(bold & fg Color.bright_black)
+
 (* Additional helper text. *)
 let secondary = Styling.(fg Color.cyan)
 let bold = Styling.bold

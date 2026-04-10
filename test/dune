@@ -3,4 +3,5 @@
  (libraries
   alcotest
   ; Internal tests
+  test_fs
   test_pretty))
